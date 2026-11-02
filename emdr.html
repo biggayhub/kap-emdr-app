@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c0b13">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Session Guide">
+<title>Steady — Guided EMDR Session</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0b13; --card:#15131f; --ink:#e6e1d8; --muted:#9a94a6; --line:#272338;
+  --accent:#e0b48a; --accent-soft:#2a2333; --warn:#e39a7f; --warn-soft:#2b1d21; --dot:#ecc79f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% 0%, #17132a 0%, var(--bg) 60%) fixed;color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:16px 18px 96px}
+.modes{display:flex;gap:4px;padding:4px;margin:4px 0 14px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.02)}
+.modes a{flex:1;text-align:center;padding:9px 10px;border-radius:999px;color:var(--muted);text-decoration:none;font:500 14px Inter,system-ui,sans-serif;transition:background .8s ease,color .8s ease}
+.modes a.on{background:var(--accent-soft);color:var(--accent)}
+header{display:flex;align-items:center;justify-content:space-between;padding:6px 0 14px}
+.brand{font-family:Fraunces,serif;font-size:20px;font-weight:600;letter-spacing:.2px}
+.progress{height:3px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:18px}
+.progress>i{display:block;height:100%;background:var(--accent);width:0;transition:width 1.2s ease}
+.phase{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:6px}
+h1{font-family:Fraunces,serif;font-weight:400;font-size:27px;line-height:1.2;margin-bottom:12px}
+h2{font-family:Fraunces,serif;font-weight:400;font-size:19px;margin:18px 0 8px;color:var(--accent)}
+p{margin-bottom:12px}
+.muted{color:var(--muted);font-size:14.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.card.warn{background:var(--warn-soft);border-color:transparent}
+ul.clean{padding-left:18px;margin:6px 0 10px} ul.clean li{margin:4px 0}
+label{display:block;font-weight:500;margin:14px 0 6px}
+textarea,input[type=text]{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;resize:vertical}
+textarea{min-height:84px}
+textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btn{display:block;width:100%;font:600 16px Inter,sans-serif;border:0;border-radius:14px;padding:15px;margin-top:12px;cursor:pointer;background:var(--accent);color:#1a1209}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px}.row .btn{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 12px;font:14px Inter,sans-serif;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#1a1209}
+.scale{display:grid;gap:6px;margin:8px 0 4px}
+.scale button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 0;font:600 15px Inter,sans-serif;cursor:pointer}
+.scale button.on{background:var(--accent);color:#1a1209;border-color:var(--accent)}
+.scale-ends{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted)}
+.check{display:flex;gap:10px;align-items:flex-start;margin:10px 0;font-weight:400}
+.check input{margin-top:4px;width:20px;height:20px;accent-color:var(--accent);flex:none}
+.stopbar{position:fixed;left:0;right:0;bottom:0;padding:10px 18px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 35%);display:flex;justify-content:center;pointer-events:none}
+.stopbar button{pointer-events:auto;max-width:520px;width:100%;background:var(--card);color:var(--warn);border:1.5px solid var(--warn);border-radius:14px;padding:12px;font:600 15px Inter,sans-serif;cursor:pointer}
+/* BLS stage */
+.stage{position:relative;height:120px;border-radius:16px;background:var(--card);border:1px solid var(--line);margin:14px 0;overflow:hidden}
+.track{position:absolute;left:24px;right:24px;top:50%;height:1px;background:var(--line)}
+.ball{position:absolute;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:radial-gradient(circle,#fff1dc 0%,var(--dot) 45%,rgba(236,199,159,.0) 75%);box-shadow:0 0 26px rgba(236,199,159,.45);left:24px}
+.counter{text-align:center;color:var(--muted);font-size:14px}
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.toggle{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}
+.toggle input{width:20px;height:20px;accent-color:var(--accent)}
+.toggle select option{background:var(--card);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.breath{width:150px;height:150px;border-radius:50%;margin:20px auto;background:radial-gradient(circle,rgba(236,190,150,.28),rgba(140,120,200,.10) 60%,transparent 72%);border:1.4px solid rgba(242,208,170,.5);display:flex;align-items:center;justify-content:center;font-family:Fraunces,serif;font-size:18px;color:var(--accent);transition:transform 4s cubic-bezier(.45,0,.55,1)}
+.breath.big{transform:scale(1.35)}
+.summary dt{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:10px}
+.summary dd{margin:2px 0 0}
+.hist{border-top:1px solid var(--line);padding:10px 0;font-size:14px}
+.hidden{display:none!important}
+.fade{animation:fade 1.2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+body{animation:pageIn 1.4s ease both;transition:opacity .9s ease}
+body.leaving{opacity:0;animation:none}
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="modes"><a href="index.html">KAP session</a><a href="emdr.html" class="on">EMDR</a></nav>
+  <a class="discBanner" href="disclaimer.html"><b>Personal project · Not medical advice or treatment.</b> Not reviewed by any clinician. Use at your own risk. In crisis, call or text 988. <u>Full disclaimer</u></a>
+  <header><div class="brand">Steady</div><div class="muted" id="stepLabel"></div></header>
+  <div class="progress"><i id="bar"></i></div>
+  <main id="view"></main>
+  <p class="discFoot">Personal hobby project · Not medical advice, therapy or treatment · <a href="disclaimer.html">Disclaimer</a></p>
+</div>
+<div class="stopbar" id="stopbar"><button onclick="emergencyStop()">I need to pause</button></div>
+
+<script>
+/* ---------- State ---------- */
+const S = {
+  step:0, calm:(()=>{try{return JSON.parse(localStorage.getItem('steady-calm'))||{place:'',word:''};}catch(e){return {place:'',word:''};}})(),
+  target:{memory:'',image:'',nc:'',pc:'',voc:null,emotions:[],suds:null,body:''},
+  sets:[], sudsLog:[], vocEnd:null, sudsEnd:null, bodyEnd:'', bls:{speed:1.1,audio:true,passes:24}
+};
+let returnStep = null;
+
+const NC = ["I'm not safe","I'm not good enough","It was my fault","I'm powerless","I can't trust myself","I'm not in control","I should have done something","I'm unlovable","I'm in danger"];
+const PC = ["I'm safe now","I'm good enough","I did the best I could","I have choices now","I can trust myself","I can handle this","I'm learning and growing","I'm worthy of love","It's over"];
+const EMO = ["Sad","Afraid","Angry","Ashamed","Guilty","Anxious","Helpless","Lonely","Disgusted","Numb"];
+
+const steps = [welcome, screen, grounding, calmPlace, calmBLS, target, cognitions, ratings, desensitize, install, bodyScan, closure, done];
+const labels = ["Welcome","Check-in","Grounding","Calm place","Calm place","Target","Beliefs","Baseline","Processing","Installation","Body scan","Closing","Complete"];
+
+function go(n){ stopBLS(); S.step=n; render(); window.scrollTo(0,0); }
+function next(){ go(S.step+1); }
+function render(){
+  document.getElementById('bar').style.width = (S.step/(steps.length-1)*100)+'%';
+  document.getElementById('stepLabel').textContent = labels[S.step];
+  document.getElementById('stopbar').classList.toggle('hidden', S.step<2 || S.step===steps.length-1);
+  const v=document.getElementById('view'); v.className='fade'; v.innerHTML=''; void v.offsetWidth;
+  steps[S.step](v);
+}
+const h = (html)=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content;};
+const esc = s => String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- Screens ---------- */
+function welcome(v){
+  v.append(h(`
+  <div class="phase">Self-guided session</div>
+  <h1>A gentle, guided EMDR-style session</h1>
+  <p>This app walks you through the structure of an EMDR session — preparing a calm place, choosing a memory, processing it with bilateral (left–right) stimulation, and closing safely.</p>
+  <div class="card warn">
+    <strong>Please read first.</strong>
+    <p style="margin-top:6px">This is a self-help tool, not therapy. EMDR for trauma should be done with a trained, licensed clinician. Use this only for <em>mild, everyday</em> disturbances (a stressful meeting, a small embarrassment, a worry) — or between sessions if your therapist has suggested it.</p>
+    <p style="margin-top:6px">Don't use this during or soon after a ketamine session, or under the influence of any substance, unless your clinician is guiding you.</p>
+    <p style="margin-bottom:0">If you're in crisis, call or text <strong>988</strong> (US Suicide &amp; Crisis Lifeline) or your local emergency number.</p>
+  </div>
+  <p class="muted">Plan for about 30–45 minutes somewhere private. Headphones help if you use the audio tones.</p>
+  <button class="btn" onclick="next()">Begin</button>
+  ${historyHTML()}`));
+}
+
+function screen(v){
+  v.append(h(`
+  <div class="phase">Step 1 · Safety check</div>
+  <h1>Is today a good day for this?</h1>
+  <p class="muted">Tick each one that's true for you right now.</p>
+  <div class="card">
+    <label class="check"><input type="checkbox" class="sc"> I'm not in crisis and not having thoughts of harming myself.</label>
+    <label class="check"><input type="checkbox" class="sc"> The memory I'll work on is mild to moderate — not a major trauma.</label>
+    <label class="check"><input type="checkbox" class="sc"> I'm not under the influence of alcohol or drugs, including ketamine.</label>
+    <label class="check"><input type="checkbox" class="sc"> I don't have a history of dissociation, psychosis, or seizures triggered by moving lights (or my clinician has approved this).</label>
+    <label class="check"><input type="checkbox" class="sc"> I understand I can stop at any time with the "I need to pause" button.</label>
+  </div>
+  <p class="muted" id="scNote">If any of these aren't true today, it's wise to wait or work with a therapist instead. The EMDR International Association (emdria.org) has a directory of trained clinicians.</p>
+  <button class="btn" id="scGo" disabled onclick="next()">Continue</button>
+  <button class="btn ghost" onclick="go(0)">Back</button>`));
+  const boxes=[...v.querySelectorAll('.sc')], btn=v.querySelector('#scGo');
+  boxes.forEach(b=>b.onchange=()=>btn.disabled=!boxes.every(x=>x.checked));
+}
+
+function grounding(v){
+  v.append(h(`
+  <div class="phase">Step 2 · Grounding</div>
+  <h1>Settle in</h1>
+  <p>Sit comfortably with your feet on the floor. Follow the circle for a few slow breaths.</p>
+  <div class="breath" id="breath">Ready</div>
+  <p class="counter" id="bcount">&nbsp;</p>
+  <button class="btn" id="bstart">Start breathing (1 min)</button>
+  <button class="btn ghost" onclick="next()">Skip / Continue</button>`));
+  v.querySelector('#bstart').onclick=e=>{e.target.disabled=true;breathe(v.querySelector('#breath'),v.querySelector('#bcount'),6,()=>{e.target.textContent='Continue';e.target.disabled=false;e.target.onclick=next;});};
+}
+let breathTimer=null;
+function breathe(el,cnt,rounds,done){
+  let r=0;const cycle=()=>{
+    if(!el.isConnected)return;
+    if(r>=rounds){el.textContent='Well done';el.classList.remove('big');cnt.textContent='';done&&done();return;}
+    r++;cnt.textContent=`Breath ${r} of ${rounds}`;
+    el.textContent='Breathe in';el.classList.add('big');
+    breathTimer=setTimeout(()=>{el.textContent='Breathe out';el.classList.remove('big');breathTimer=setTimeout(cycle,5000);},4000);
+  };cycle();
+}
+
+function calmPlace(v){
+  v.append(h(`
+  <div class="phase">Step 3 · Resource</div>
+  <h1>Your calm place</h1>
+  <p>Bring to mind a place — real or imagined — where you feel safe, calm, and at ease. A beach, a forest, a cozy room.</p>
+  <p>Take a moment to picture it: what you see, hear, smell and feel there. You don't need to write anything down.</p>
+  <details class="card" ${S.calm.place||S.calm.word?'open':''}>
+    <summary class="muted" style="cursor:pointer">Optional: note it down so we can remind you of it later</summary>
+    <label>What's it like there?</label>
+    <textarea id="cp" placeholder="Warm sand, the sound of waves, salty air…">${esc(S.calm.place)}</textarea>
+    <label>A word that captures it (your cue word)</label>
+    <input type="text" id="cw" placeholder="e.g. Shore" value="${esc(S.calm.word)}">
+    <p class="muted" style="margin-top:10px">Saved only on this device, so it's here next time too.</p>
+  </details>
+  <button class="btn" id="go">I have my calm place in mind</button>`));
+  const cp=v.querySelector('#cp'),cw=v.querySelector('#cw'),b=v.querySelector('#go');
+  const save=()=>{S.calm.place=cp.value.trim();S.calm.word=cw.value.trim();try{localStorage.setItem('steady-calm',JSON.stringify(S.calm));}catch(e){}};
+  cp.oninput=cw.oninput=save;b.onclick=()=>{save();next();};
+}
+
+function calmBLS(v){
+  v.append(h(`
+  <div class="phase">Step 3 · Strengthen the calm place</div>
+  <h1>Let it grow stronger</h1>
+  <p>Picture your calm place${S.calm.word?` and say <strong>"${esc(S.calm.word)}"</strong> to yourself`:''}. Follow the light with your eyes only, keeping your head still. This is a short, slow set.</p>
+  ${blsHTML()}
+  <p class="muted" id="after"></p>
+  <button class="btn" id="startB">Start short set</button>
+  <button class="btn ghost hidden" id="cont" onclick="next()">That feels good — continue</button>`));
+  wireSettings(v);
+  const after=v.querySelector('#after'),cont=v.querySelector('#cont');
+  v.querySelector('#startB').onclick=e=>{
+    runBLS(v,8,{slow:true},()=>{e.target.textContent='Do another short set';
+      after.textContent='Notice any pleasant feelings in your body. If anything unpleasant came up, pick a different calm place.';
+      cont.classList.remove('hidden');});
+  };
+}
+
+function target(v){
+  v.append(h(`
+  <div class="phase">Step 4 · Target</div>
+  <h1>Choose what to work on</h1>
+  <p>Pick a <strong>mild</strong> disturbing memory or situation — something that bothers you at about a 3–6 out of 10, not a 9 or 10.</p>
+  <label>Briefly, what happened? (a few words is fine)</label>
+  <textarea id="m" placeholder="When I froze during the presentation…">${esc(S.target.memory)}</textarea>
+  <label>What image represents the worst part of it?</label>
+  <textarea id="i" placeholder="Everyone's faces looking at me…">${esc(S.target.image)}</textarea>
+  <button class="btn" id="go" disabled>Continue</button>`));
+  const m=v.querySelector('#m'),i=v.querySelector('#i'),b=v.querySelector('#go');
+  const chk=()=>{S.target.memory=m.value.trim();S.target.image=i.value.trim();b.disabled=!(S.target.memory&&S.target.image);};
+  m.oninput=i.oninput=chk;chk();b.onclick=next;
+}
+
+function cognitions(v){
+  v.append(h(`
+  <div class="phase">Step 4 · Beliefs</div>
+  <h1>What does it say about you?</h1>
+  <label>When you hold that image, what negative belief about yourself goes with it?</label>
+  <div class="chips" id="nc">${NC.map(x=>`<button class="chip">${x}</button>`).join('')}</div>
+  <input type="text" id="ncT" placeholder="Or write your own…" value="${esc(S.target.nc)}">
+  <label>What would you <em>prefer</em> to believe about yourself instead?</label>
+  <div class="chips" id="pc">${PC.map(x=>`<button class="chip">${x}</button>`).join('')}</div>
+  <input type="text" id="pcT" placeholder="Or write your own…" value="${esc(S.target.pc)}">
+  <button class="btn" id="go" disabled>Continue</button>`));
+  const b=v.querySelector('#go');
+  const wire=(wrap,inp,key)=>{
+    const W=v.querySelector(wrap),I=v.querySelector(inp);
+    const sync=()=>{S.target[key]=I.value.trim();[...W.children].forEach(c=>c.classList.toggle('on',c.textContent===S.target[key]));b.disabled=!(S.target.nc&&S.target.pc);};
+    [...W.children].forEach(c=>c.onclick=()=>{I.value=c.textContent;sync();});I.oninput=sync;sync();
+  };
+  wire('#nc','#ncT','nc');wire('#pc','#pcT','pc');b.onclick=next;
+}
+
+function scaleHTML(id,min,max,lo,hi){
+  const n=max-min+1;
+  return `<div class="scale" id="${id}" style="grid-template-columns:repeat(${n},1fr)">${Array.from({length:n},(_,k)=>`<button>${min+k}</button>`).join('')}</div>
+  <div class="scale-ends"><span>${lo}</span><span>${hi}</span></div>`;
+}
+function wireScale(v,id,cb,initial){
+  const W=v.querySelector('#'+id);
+  [...W.children].forEach(c=>{if(String(initial)===c.textContent)c.classList.add('on');
+    c.onclick=()=>{[...W.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');cb(+c.textContent);};});
+}
+
+function ratings(v){
+  v.append(h(`
+  <div class="phase">Step 5 · Baseline</div>
+  <h1>Where are you starting?</h1>
+  <label>Holding the image, how true does "<em>${esc(S.target.pc)}</em>" feel right now?</label>
+  ${scaleHTML('voc',1,7,'1 · Completely false','7 · Completely true')}
+  <label>What emotions come up?</label>
+  <div class="chips" id="emo">${EMO.map(x=>`<button class="chip${S.target.emotions.includes(x)?' on':''}">${x}</button>`).join('')}</div>
+  <label>How disturbing does it feel right now?</label>
+  ${scaleHTML('suds',0,10,'0 · No disturbance','10 · Worst imaginable')}
+  <label>Where do you notice it in your body?</label>
+  <input type="text" id="body" placeholder="Tight chest, knot in stomach…" value="${esc(S.target.body)}">
+  <div class="card warn hidden" id="hiWarn">That's a high rating. For something this disturbing, it's safer to work with a therapist. You can choose a milder memory instead.<button class="btn ghost" onclick="go(5)">Choose a different memory</button></div>
+  <button class="btn" id="go" disabled>Begin processing</button>`));
+  const b=v.querySelector('#go'),warn=v.querySelector('#hiWarn');
+  const chk=()=>{b.disabled=!(S.target.voc&&S.target.suds!=null);warn.classList.toggle('hidden',!(S.target.suds>=8));};
+  wireScale(v,'voc',x=>{S.target.voc=x;chk();},S.target.voc);
+  wireScale(v,'suds',x=>{S.target.suds=x;chk();},S.target.suds);
+  [...v.querySelector('#emo').children].forEach(c=>c.onclick=()=>{c.classList.toggle('on');S.target.emotions=[...v.querySelectorAll('#emo .on')].map(x=>x.textContent);});
+  v.querySelector('#body').oninput=e=>S.target.body=e.target.value;
+  chk();b.onclick=()=>{S.sudsLog=[S.target.suds];S.sets=[];next();};
+}
+
+function desensitize(v){
+  const n=S.sets.length;
+  v.append(h(`
+  <div class="phase">Step 6 · Processing · Set ${n+1}</div>
+  <h1>${n===0?'Bring it to mind':'Go with that'}</h1>
+  ${n===0?`<p>Bring up the image, the thought "<em>${esc(S.target.nc)}</em>", and notice where you feel it in your body. Then follow the light.</p>`
+          :`<p>Notice whatever came up last time and just let it be there as you follow the light. Whatever happens is fine — you don't need to force anything.</p>`}
+  <p class="muted">Think of it like watching scenery go by from a train window. You're safe here, in the present.</p>
+  ${blsHTML()}
+  <button class="btn" id="startB">Start set</button>
+  <div id="post" class="hidden">
+    <div class="card"><strong>Take a deep breath. Let it go.</strong><p class="muted" style="margin:6px 0 0">What do you notice now? An image, thought, feeling, or sensation — anything at all.</p></div>
+    <textarea id="note" placeholder="Optional: jot down what you noticed…"></textarea>
+    <div id="sudsCheck" class="hidden">
+      <label>Check in: how disturbing does the original memory feel now?</label>
+      ${scaleHTML('suds2',0,10,'0 · None','10 · Worst')}
+    </div>
+    <div class="card warn hidden" id="rising">The distress has gone up. That can happen, but it's okay to stop here. You can pause and use your calm place, or keep going gently if you feel steady.<button class="btn ghost" onclick="emergencyStop()">Pause &amp; settle</button></div>
+    <button class="btn" id="again">Continue with another set</button>
+    <button class="btn ghost hidden" id="toInstall">It feels neutral now — move on</button>
+    <button class="btn ghost" id="stopHere">Stop processing &amp; close for today</button>
+  </div>`));
+  wireSettings(v);
+  const post=v.querySelector('#post'),start=v.querySelector('#startB'),checkSuds=(n+1)%2===0;
+  let setSuds=null;
+  start.onclick=()=>runBLS(v,S.bls.passes,{},()=>{start.classList.add('hidden');post.classList.remove('hidden');
+    if(checkSuds)v.querySelector('#sudsCheck').classList.remove('hidden');post.scrollIntoView({behavior:'smooth'});});
+  wireScale(v,'suds2',x=>{setSuds=x;const last=S.sudsLog[S.sudsLog.length-1];
+    v.querySelector('#rising').classList.toggle('hidden',!(x>=last+2||x>=9));
+    v.querySelector('#toInstall').classList.toggle('hidden',x>1);},null);
+  const record=()=>{S.sets.push({note:v.querySelector('#note').value.trim(),suds:setSuds});if(setSuds!=null)S.sudsLog.push(setSuds);};
+  v.querySelector('#again').onclick=()=>{record();render();window.scrollTo(0,0);};
+  v.querySelector('#toInstall').onclick=()=>{record();S.sudsEnd=setSuds;go(9);};
+  v.querySelector('#stopHere').onclick=()=>{record();S.sudsEnd=setSuds??S.sudsLog[S.sudsLog.length-1];S.incomplete=true;go(11);};
+}
+
+function install(v){
+  v.append(h(`
+  <div class="phase">Step 7 · Installation</div>
+  <h1>Strengthen the new belief</h1>
+  <p>Does "<em>${esc(S.target.pc)}</em>" still fit, or is there a better phrase now?</p>
+  <input type="text" id="pc" value="${esc(S.target.pc)}">
+  <p style="margin-top:12px">Hold the original memory together with these words, and follow the light.</p>
+  ${blsHTML()}
+  <button class="btn" id="startB">Start set</button>
+  <div id="post" class="hidden">
+    <label>How true does "<em id="pcEcho"></em>" feel now?</label>
+    ${scaleHTML('voc2',1,7,'1 · False','7 · True')}
+    <button class="btn" id="go" disabled>Continue</button>
+    <button class="btn ghost" id="more">Do another set to strengthen it</button>
+  </div>`));
+  wireSettings(v);
+  const pc=v.querySelector('#pc');pc.oninput=()=>S.target.pc=pc.value.trim()||S.target.pc;
+  const post=v.querySelector('#post');
+  v.querySelector('#startB').onclick=e=>runBLS(v,12,{slow:true},()=>{e.target.classList.add('hidden');v.querySelector('#pcEcho').textContent=S.target.pc;post.classList.remove('hidden');});
+  wireScale(v,'voc2',x=>{S.vocEnd=x;v.querySelector('#go').disabled=false;},null);
+  v.querySelector('#go').onclick=next;
+  v.querySelector('#more').onclick=()=>{post.classList.add('hidden');const s=v.querySelector('#startB');s.classList.remove('hidden');s.click();};
+}
+
+function bodyScan(v){
+  v.append(h(`
+  <div class="phase">Step 8 · Body scan</div>
+  <h1>Check in with your body</h1>
+  <p>Close your eyes. Hold the memory and the words "<em>${esc(S.target.pc)}</em>" in mind. Slowly scan from the top of your head to your feet.</p>
+  <label>Do you notice any tension, tightness, or unusual sensation?</label>
+  <div class="row"><button class="btn ghost" id="no">Feels clear</button><button class="btn ghost" id="yes">Something's there</button></div>
+  <div id="yesBox" class="hidden">
+    <input type="text" id="where" placeholder="Where, and what's it like?" style="margin-top:12px">
+    <p class="muted" style="margin-top:8px">Just notice that sensation and follow the light.</p>
+    ${blsHTML()}
+    <button class="btn" id="startB">Start set</button>
+    <button class="btn ghost hidden" id="cont" onclick="next()">Continue to closing</button>
+  </div>`));
+  v.querySelector('#no').onclick=()=>{S.bodyEnd='Clear';next();};
+  v.querySelector('#yes').onclick=()=>{v.querySelector('#yesBox').classList.remove('hidden');wireSettings(v);};
+  v.addEventListener('click',e=>{if(e.target.id==='startB'){S.bodyEnd=v.querySelector('#where').value||'Some sensation';
+    runBLS(v,S.bls.passes,{},()=>{e.target.textContent='Another set';v.querySelector('#cont').classList.remove('hidden');});}});
+}
+
+function closure(v){
+  v.append(h(`
+  <div class="phase">Step 9 · Closing</div>
+  <h1>Close the session safely</h1>
+  ${S.incomplete?`<p>You stopped before the memory felt fully neutral — that's completely okay. Processing can continue on its own, and you can return to it another day.</p>`:''}
+  <h2>The container</h2>
+  <p>Imagine a strong container — a vault, a chest, a locked box. Picture placing anything left over from today inside it. Close it. Know that it will be there, sealed, until you choose to open it again.</p>
+  <h2>Return to your calm place</h2>
+  <p>Now bring up your calm place${S.calm.place?`: <em>${esc(S.calm.place)}</em>`:''}.${S.calm.word?` Say "<strong>${esc(S.calm.word)}</strong>" to yourself.`:''} Take a few slow breaths there.</p>
+  <div class="breath" id="breath">Ready</div>
+  <button class="btn" id="bstart">Breathe (30 sec)</button>
+  <div class="card">
+    <strong>Over the next few days</strong>
+    <ul class="clean muted">
+      <li>New memories, dreams, or feelings may surface. That's a normal part of processing.</li>
+      <li>Jot them down if you like, then use your calm place or container.</li>
+      <li>If anything feels overwhelming, reach out to a therapist, or call/text 988 in a crisis.</li>
+    </ul>
+  </div>
+  <button class="btn" onclick="finish()">Finish session</button>`));
+  v.querySelector('#bstart').onclick=e=>{e.target.disabled=true;breathe(v.querySelector('#breath'),{set textContent(x){}},3,()=>e.target.disabled=false);};
+}
+
+function finish(){
+  const rec={date:new Date().toISOString(),memory:S.target.memory,nc:S.target.nc,pc:S.target.pc,
+    sudsStart:S.target.suds,sudsEnd:S.sudsEnd??S.sudsLog[S.sudsLog.length-1],vocStart:S.target.voc,vocEnd:S.vocEnd,sets:S.sets.length};
+  try{const h=JSON.parse(localStorage.getItem('steady-hist')||'[]');h.unshift(rec);localStorage.setItem('steady-hist',JSON.stringify(h.slice(0,20)));}catch(e){}
+  S.last=rec;next();
+}
+
+function done(v){
+  const r=S.last||{};
+  v.append(h(`
+  <div class="phase">Session complete</div>
+  <h1>Well done</h1>
+  <p>Take a moment before moving on with your day. A glass of water and a short walk can help.</p>
+  <dl class="card summary">
+    <dt>Memory</dt><dd>${esc(r.memory)}</dd>
+    <dt>Disturbance</dt><dd>${r.sudsStart} → ${r.sudsEnd??'—'} <span class="muted">(0–10)</span></dd>
+    <dt>"${esc(r.pc)}"</dt><dd>${r.vocStart} → ${r.vocEnd??'—'} <span class="muted">(1–7 true)</span></dd>
+    <dt>Sets completed</dt><dd>${r.sets}</dd>
+  </dl>
+  <button class="btn ghost" id="copy">Copy summary (to share with your therapist)</button>
+  <button class="btn" onclick="location.reload()">Return home</button>`));
+  v.querySelector('#copy').onclick=async e=>{
+    const t=`EMDR self-session ${new Date(r.date).toLocaleString()}\nMemory: ${r.memory}\nNegative belief: ${r.nc}\nPositive belief: ${r.pc}\nSUDS: ${r.sudsStart} → ${r.sudsEnd}\nVOC: ${r.vocStart} → ${r.vocEnd}\nSets: ${r.sets}\nNotes:\n${S.sets.map((s,i)=>s.note?`  ${i+1}. ${s.note}`:'').filter(Boolean).join('\n')}`;
+    try{await navigator.clipboard.writeText(t);e.target.textContent='Copied ✓';}catch(_){e.target.textContent='Copy not available here';}
+  };
+}
+
+function historyHTML(){
+  let hist=[];try{hist=JSON.parse(localStorage.getItem('steady-hist')||'[]');}catch(e){}
+  if(!hist.length)return'';
+  return `<h2>Past sessions</h2>`+hist.slice(0,5).map(r=>`<div class="hist"><strong>${new Date(r.date).toLocaleDateString()}</strong> · ${esc(r.memory).slice(0,40)}<br><span class="muted">Disturbance ${r.sudsStart} → ${r.sudsEnd??'—'}</span></div>`).join('');
+}
+
+/* ---------- Emergency stop ---------- */
+function emergencyStop(){
+  stopBLS(); returnStep=S.step;
+  const v=document.getElementById('view');v.className='fade';v.innerHTML='';
+  document.getElementById('stopbar').classList.add('hidden');
+  v.append(h(`
+  <div class="phase">Paused</div>
+  <h1>You're safe. Let's slow down.</h1>
+  <p>Open your eyes and look around the room. Feel your feet on the floor.</p>
+  <div class="card">
+    <strong>5-4-3-2-1</strong>
+    <ul class="clean muted"><li>Name <b>5</b> things you can see</li><li><b>4</b> things you can touch</li><li><b>3</b> things you can hear</li><li><b>2</b> things you can smell</li><li><b>1</b> thing you can taste</li></ul>
+  </div>
+  <p>Now picture your container. Put whatever came up inside and close the lid.</p>
+  ${S.calm.word?`<p>Then go to your calm place and say "<strong>${esc(S.calm.word)}</strong>".</p>`:''}
+  <div class="breath" id="breath">Ready</div>
+  <button class="btn" id="bstart">Breathe with me</button>
+  <div class="card warn">If you feel unsafe or overwhelmed, call or text <strong>988</strong> (US) or your local emergency number. Reaching out is a strong move.</div>
+  <button class="btn ghost" onclick="go(returnStep)">I feel steady — go back</button>
+  <button class="btn ghost" onclick="S.incomplete=true;S.sudsEnd=S.sudsLog[S.sudsLog.length-1];go(11)">End the session gently</button>`));
+  v.querySelector('#bstart').onclick=e=>{e.target.disabled=true;breathe(v.querySelector('#breath'),{set textContent(x){}},6,()=>e.target.disabled=false);};
+  window.scrollTo(0,0);
+}
+
+/* ---------- Bilateral stimulation ---------- */
+function blsHTML(){
+  return `<div class="stage"><div class="track"></div><div class="ball"></div></div>
+  <p class="counter" data-c>&nbsp;</p>
+  <div class="settings">
+    <label class="toggle">Audio tones <input type="checkbox" data-audio ${S.bls.audio?'checked':''}></label>
+    <label class="toggle">Passes <select data-passes style="font:inherit;background:transparent;color:inherit;border:0">${[12,18,24,30,36].map(n=>`<option ${n===S.bls.passes?'selected':''}>${n}</option>`).join('')}</select></label>
+  </div>
+  <label style="font-size:14px;margin-top:10px">Speed</label>
+  <input type="range" min="0.6" max="1.8" step="0.1" value="${2.4-S.bls.speed}" data-speed>
+  <div class="scale-ends"><span>Slower</span><span>Faster</span></div>`;
+}
+function wireSettings(v){
+  v.querySelectorAll('[data-audio]').forEach(x=>x.onchange=()=>S.bls.audio=x.checked);
+  v.querySelectorAll('[data-passes]').forEach(x=>x.onchange=()=>S.bls.passes=+x.value);
+  v.querySelectorAll('[data-speed]').forEach(x=>x.oninput=()=>S.bls.speed=2.4-(+x.value));
+}
+let raf=null,actx=null,blsActive=false;
+function tone(pan){
+  if(!S.bls.audio)return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended')actx.resume();
+    const o=actx.createOscillator(),g=actx.createGain(),p=actx.createStereoPanner?actx.createStereoPanner():null;
+    o.type='sine';o.frequency.value=396;const t=actx.currentTime;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.04);g.gain.exponentialRampToValueAtTime(.001,t+.35);
+    if(p){p.pan.value=pan;o.connect(g).connect(p).connect(actx.destination);}else o.connect(g).connect(actx.destination);
+    o.start(t);o.stop(t+.4);
+  }catch(e){}
+}
+function runBLS(v,passes,opt,done){
+  stopBLS();
+  const stage=v.querySelector('.stage'),ball=v.querySelector('.ball'),cnt=v.querySelector('[data-c]');
+  const btn=v.querySelector('#startB');if(btn)btn.disabled=true;
+  if(S.bls.audio)tone(0); // unlock audio on tap
+  blsActive=true;
+  let count=0,dir=1,startT=null;
+  const go=(ts)=>{
+    if(!blsActive||!ball.isConnected)return;
+    const dur=(opt.slow?S.bls.speed*1.5:S.bls.speed)*1000/2; // one pass = one side to the other
+    if(startT===null){startT=ts;tone(-1);}
+    let prog=(ts-startT)/dur;
+    if(prog>=1){
+      count++;dir*=-1;startT=ts;prog=0;
+      tone(dir>0?-1:1);
+      if(count>=passes){blsActive=false;cnt.textContent='Set complete';if(btn)btn.disabled=false;done&&done();return;}
+    }
+    const w=stage.clientWidth-48, e=.5-.5*Math.cos(Math.PI*prog);
+    const x= dir>0 ? e : 1-e;
+    ball.style.left=(24+x*w)+'px';
+    cnt.textContent=`${count} / ${passes}`;
+    raf=requestAnimationFrame(go);
+  };
+  raf=requestAnimationFrame(go);
+}
+function stopBLS(){blsActive=false;if(raf)cancelAnimationFrame(raf);clearTimeout(breathTimer);}
+
+render();
+document.querySelectorAll(".modes a").forEach(a => a.addEventListener("click", e => {
+  e.preventDefault(); if(a.classList.contains("on")) return;
+  stopBLS(); document.body.classList.add("leaving");
+  setTimeout(() => { location.href = a.getAttribute("href"); }, 900);
+}));
+</script>
+<!-- ===== Disclaimer gate (shared by KAP and EMDR pages) ===== -->
+<style>
+  #discGate{position:fixed;inset:0;z-index:9999;background:#08070e;display:none;overflow:auto;padding:calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 30px);animation:dgIn 1.2s ease both;font:15.5px/1.55 ui-sans-serif,-apple-system,system-ui,sans-serif;color:#e6e1d8}
+  #discGate.on{display:block}
+  @keyframes dgIn{from{opacity:0}to{opacity:1}}
+  #discGate .wrap{max-width:540px;margin:0 auto}
+  #discGate .tag{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#e39a7f;border:1px solid #e39a7f;border-radius:999px;padding:4px 10px}
+  #discGate h1{font:400 27px/1.2 ui-serif,Georgia,serif;margin:14px 0 10px;color:#f1e7da}
+  #discGate .big{font-size:17px;color:#f3d9c5;margin:0 0 14px}
+  #discGate ul{padding-left:20px;margin:0 0 16px}
+  #discGate li{margin:8px 0;color:#d8d2c8}
+  #discGate li b{color:#f1e7da}
+  #discGate .crisis{border:1.5px solid #e39a7f;background:rgba(227,154,127,.10);border-radius:14px;padding:12px 14px;margin:14px 0;color:#f3d9c5}
+  #discGate label{display:flex;gap:12px;align-items:flex-start;margin:12px 0;cursor:pointer;color:#e6e1d8}
+  #discGate input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:#e0b48a}
+  #discGate button{display:block;width:100%;margin-top:16px;padding:16px;border:0;border-radius:14px;background:#e0b48a;color:#1a1209;font:600 16px ui-sans-serif,system-ui,sans-serif}
+  #discGate button:disabled{opacity:.35}
+  #discGate a{color:#e0b48a}
+  .discBanner{display:block;margin:0 0 16px;padding:11px 14px;border:1.5px solid #e39a7f;border-radius:12px;background:rgba(227,154,127,.10);color:#f3d9c5;font:14px/1.45 ui-sans-serif,system-ui,sans-serif;text-decoration:none}
+  .discBanner b{color:#f7e3d3}
+  .discFoot{display:block;text-align:center;margin:26px 0 8px;color:#9a94a6;font:13px ui-sans-serif,system-ui,sans-serif}
+  .discFoot a{color:#e0b48a}
+</style>
+<div id="discGate" role="dialog" aria-modal="true" aria-labelledby="dgTitle">
+  <div class="wrap">
+    <span class="tag">Please read before using</span>
+    <h1 id="dgTitle">This is a personal project, not medical care</h1>
+    <p class="big">I made this for my own use and am sharing it with friends for feedback. It is <b>not medical advice, not therapy, not treatment</b>, and <b>not a medical device</b>.</p>
+    <ul>
+      <li><b>Not reviewed by any doctor, therapist or clinician.</b> Not affiliated with any clinic or provider.</li>
+      <li><b>No dosing or medication guidance.</b> Take ketamine only exactly as prescribed, under your care team's supervision, with a monitor present if they require one.</li>
+      <li><b>Not a substitute for professional care.</b> EMDR should be done with a trained, licensed clinician. Don't use the EMDR section for trauma or under the influence of any substance, including ketamine.</li>
+      <li><b>It does not monitor you</b> and cannot call for help.</li>
+      <li><b>The voices are AI-generated</b>, not real people.</li>
+      <li><b>Use entirely at your own risk.</b> Provided "as is", with no warranty of any kind. Adults 18+ only.</li>
+    </ul>
+    <div class="crisis"><b>In crisis or thinking about harming yourself?</b> Call or text <b>988</b> (US Suicide &amp; Crisis Lifeline). In an emergency, call <b>911</b>.</div>
+    <label><input type="checkbox" class="dgc"> I understand this is not medical advice, therapy or treatment, and I use it at my own risk.</label>
+    <label><input type="checkbox" class="dgc"> I am 18 or older.</label>
+    <p style="margin:10px 0 0"><a href="disclaimer.html">Read the full disclaimer</a></p>
+    <button id="dgGo" disabled>I understand, continue</button>
+  </div>
+</div>
+<script>
+(function(){
+  const KEY = "app_disclaimer_ack_v1", DAYS = 30;
+  let ok = false; try{ const t = +localStorage.getItem(KEY); ok = t && (Date.now() - t) < DAYS*864e5; }catch(e){}
+  const g = document.getElementById("discGate");
+  if(!ok){ g.classList.add("on"); document.documentElement.style.overflow = "hidden"; }
+  const boxes = [...g.querySelectorAll(".dgc")], go = document.getElementById("dgGo");
+  boxes.forEach(b => b.onchange = () => go.disabled = !boxes.every(x => x.checked));
+  go.onclick = () => { try{ localStorage.setItem(KEY, Date.now()); }catch(e){} g.style.transition = "opacity 1s ease"; g.style.opacity = 0;
+    setTimeout(() => { g.classList.remove("on"); g.style.opacity = ""; document.documentElement.style.overflow = ""; }, 1000); };
+})();
+</script>
+
+</body>
+</html>

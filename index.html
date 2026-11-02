@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Session Guide">
+<title>KAP Session Guide</title>
+<style>
+  :root{
+    --bg:#0c0b13; --ink:#e6e1d8; --dim:#9a94a6; --faint:#3a3648; --accent:#e0b48a; --line:#1f1c2a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font:17px/1.5 ui-serif, Georgia, "Iowan Old Style", serif;}
+  body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+  .screen{display:none;min-height:100%;padding:28px 22px 40px;max-width:520px;margin:0 auto}
+  .screen.on{display:block;animation:softIn 2.2s ease both}
+  @keyframes softIn{from{opacity:0}to{opacity:1}}
+  body{transition:opacity .9s ease}
+  body.leaving{opacity:0}
+  h1{font-weight:400;font-size:28px;letter-spacing:.01em;margin:18px 0 6px}
+  h2{font-weight:400;font-size:19px;margin:28px 0 10px;color:var(--accent)}
+  p{margin:0 0 12px}
+  .muted{color:var(--dim);font-size:15px}
+  .sans{font-family:ui-sans-serif,-apple-system,system-ui,sans-serif}
+  label.check{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+  label.check input{appearance:none;flex:none;width:24px;height:24px;border:1.5px solid var(--faint);border-radius:50%;margin-top:1px;display:grid;place-items:center}
+  label.check input:checked{border-color:var(--accent);background:var(--accent)}
+  label.check input:checked::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--bg)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
+  .chip{font:15px ui-sans-serif,-apple-system,system-ui,sans-serif;padding:10px 16px;border-radius:999px;border:1px solid var(--faint);background:none;color:var(--ink)}
+  .chip.sel{border-color:var(--accent);color:var(--accent)}
+  textarea{width:100%;min-height:90px;background:#0e0f13;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:inherit;padding:12px;resize:vertical}
+  select{width:100%;background:#0e0f13;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:15px ui-sans-serif,system-ui,sans-serif;padding:11px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .btn{display:block;width:100%;margin-top:26px;padding:18px;border-radius:14px;border:none;background:var(--accent);color:#141008;
+    font:600 17px ui-sans-serif,-apple-system,system-ui,sans-serif}
+  .btn.ghost{background:none;border:1px solid var(--faint);color:var(--ink);font-weight:500}
+  .btn:disabled{opacity:.35}
+  .note{border-left:2px solid var(--accent);padding:4px 0 4px 14px;margin:18px 0;color:var(--dim);font-size:15px}
+
+  .voice{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 14px;margin:0 0 8px;border:1px solid var(--line);border-radius:12px;background:#0c0d11;color:var(--ink);font:inherit}
+  .voice.sel{border-color:var(--accent)}
+  .voice .play{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--faint);display:grid;place-items:center;color:var(--accent);font:13px ui-sans-serif,system-ui}
+  .voice.sel .play{border-color:var(--accent)}
+  .voice b{font-weight:500;display:block}
+  .others{margin-top:4px}
+  .others summary{list-style:none;cursor:pointer;padding:12px 14px;border:1px dashed var(--faint);border-radius:12px;color:var(--dim);font:14px ui-sans-serif,system-ui,sans-serif;display:flex;justify-content:space-between}
+  .others summary::-webkit-details-marker{display:none}
+  .others summary::after{content:"▾";transition:transform .6s ease}
+  .others[open] summary::after{transform:rotate(180deg)}
+  .others summary span{opacity:.6;margin-left:auto;margin-right:10px}
+  .othersInner{margin-top:8px;animation:softIn 1.2s ease both}
+  .voice span.d{color:var(--dim);font-size:14px}
+  /* Session (dark) view */
+  #session{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 42%, #1b1530 0%, #0d0a18 50%, #050409 100%);display:none;max-width:none;padding:0;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  #session.on{display:block;animation:softIn 2.5s ease both}
+  #orb{position:absolute;left:50%;top:44%;width:190px;height:190px;margin:-95px 0 0 -95px;border-radius:50%;will-change:transform,opacity;
+    background:radial-gradient(circle, rgba(255,222,186,.60) 0%, rgba(236,176,140,.30) 26%, rgba(170,140,220,.13) 50%, rgba(120,100,190,0) 70%);
+    filter:blur(2px);opacity:.6}
+  #bRing{position:absolute;left:50%;top:44%;width:340px;height:340px;margin:-170px 0 0 -170px;opacity:0;pointer-events:none;overflow:visible}
+  #breathLbl{position:absolute;left:0;right:0;top:calc(44% + 168px);text-align:center;opacity:0;pointer-events:none}
+  #bWord{display:block;font-size:26px;letter-spacing:.04em;color:#ecd9c2}
+  #bCount{display:block;margin-top:6px;font:15px ui-sans-serif,system-ui,sans-serif;letter-spacing:.3em;color:#8f84a8}
+  #caption{position:absolute;left:0;right:0;bottom:22%;padding:0 34px;text-align:center;color:#6f6c66;font-size:18px;min-height:3em;transition:opacity 3s ease}
+  #phaseLbl{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top) + 22px);text-align:center;color:#33343a;font:13px ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+  #hold{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 22px);text-align:center;color:#2a2b30;font:12px ui-sans-serif,system-ui,sans-serif}
+  #ring{position:absolute;left:50%;top:44%;width:150px;height:150px;margin:-75px 0 0 -75px;opacity:0;transition:opacity .8s ease;pointer-events:none}
+  #tapGate{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
+  #tapGate.on{display:flex;animation:softIn 3s ease both}
+  #tapGate .big{font-size:24px;color:#9a968e;margin-bottom:10px}
+  #tapGate .small{color:#4b4c52;font:14px ui-sans-serif,system-ui,sans-serif}
+  #pausedLayer{position:absolute;inset:0;background:rgba(10,8,20,.93);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px}
+  #pausedLayer.on{display:flex;animation:softIn 1.4s ease both}
+  #pausedLayer .btn{max-width:320px;margin:0}
+  .pvol{width:100%;max-width:320px;margin:4px 0 10px;max-height:52vh;overflow:auto}
+  .snd label{display:flex;justify-content:space-between;align-items:baseline;color:var(--dim);font:14px ui-sans-serif,system-ui,sans-serif;margin:16px 0 4px}
+  .pvsel{width:100%;background:#15131f;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:15px ui-sans-serif,system-ui,sans-serif;padding:10px}
+  .pvmsg{display:block;min-height:1.2em;margin-top:6px;color:var(--dim);font:13px ui-sans-serif,system-ui,sans-serif}
+  .snd label span{font-size:12px;opacity:.7}
+  .snd input{width:100%;height:30px;accent-color:var(--accent)}
+  .pvol label{display:block;color:#8a8780;font:14px ui-sans-serif,system-ui,sans-serif;margin:14px 0 4px}
+  .pvol input{width:100%;height:32px;accent-color:#c9a46a}
+  .modes{display:flex;gap:4px;padding:4px;margin:4px 0 14px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.02)}
+  .modes a{flex:1;text-align:center;padding:9px 10px;border-radius:999px;color:var(--dim);text-decoration:none;font:500 14px ui-sans-serif,system-ui,sans-serif;transition:background .8s ease,color .8s ease}
+  .modes a.on{background:#2a2333;color:var(--accent)}
+  #resumeCard{display:none;border:1px solid var(--accent);border-radius:14px;padding:18px;margin:18px 0 8px;background:#0e0d0a}
+  #resumeCard .btn{margin-top:14px}
+  #resumeCard .link{display:block;width:100%;margin-top:10px;background:none;border:none;color:var(--dim);font:14px ui-sans-serif,system-ui,sans-serif;padding:10px}
+</style>
+</head>
+<body>
+
+<!-- 1. Prepare -->
+<section class="screen on" id="prep">
+  <nav class="modes"><a href="index.html" class="on">KAP session</a><a href="emdr.html">EMDR</a></nav>
+  <a class="discBanner" href="disclaimer.html"><b>Personal project · Not medical advice or treatment.</b> Not reviewed by any clinician. Use at your own risk. In crisis, call or text 988. <u>Full disclaimer</u></a>
+  <h1>Session guide</h1>
+  <div id="resumeCard">
+    <div style="color:var(--accent);font-size:19px">Your last session is saved</div>
+    <p class="muted" id="resumeWhere" style="margin:6px 0 0"></p>
+    <button class="btn" id="resumeSessionBtn">Resume session</button>
+    <button class="link" id="freshBtn">Start a new session instead</button>
+  </div>
+  <p class="muted">A spoken companion for an at-home ketamine-assisted psychotherapy session, lying in bed. After one tap to start and one tap once you’ve taken your medicine, it runs on its own.</p>
+
+  <div class="note">This guide doesn't replace your clinician. Take your medicine exactly as they prescribed, and follow their instructions about food, other medications and having someone with you.</div>
+
+  <h2>Before you begin</h2>
+  <div id="checks">
+    <label class="check"><input type="checkbox"><span>Your sitter or monitor is here, or nearby as your care team arranged</span></label>
+    <label class="check"><input type="checkbox"><span>You’ve followed your clinician’s pre-session instructions</span></label>
+    <label class="check"><input type="checkbox"><span>Bathroom visited, water and a bowl or bag within reach</span></label>
+    <label class="check"><input type="checkbox"><span>Phone on Do Not Disturb, brightness turned down, plugged in</span></label>
+    <label class="check"><input type="checkbox"><span>Eye mask and headphones ready (optional but helpful)</span></label>
+    <label class="check"><input type="checkbox"><span>Nowhere to drive or be for the rest of the day or night</span></label>
+  </div>
+
+  <h2>Intention</h2>
+  <p class="muted">A few words you'd like to bring into the session. They’ll be read back to you.</p>
+  <textarea id="intention" placeholder="e.g. I want to meet my grief with kindness"></textarea>
+
+  <h2>Voice</h2>
+  <p class="muted">Tap a voice to hear it. The one you tap last is the one that guides you.</p>
+  <div id="voiceList"></div>
+
+  <h2>Length of the journey</h2>
+  <p class="muted">Match this to the session length your care team gave you.</p>
+  <div class="row" id="lenRow">
+    <button class="chip" data-v="40">40 min</button>
+    <button class="chip sel" data-v="60">60 min</button>
+    <button class="chip" data-v="75">75 min</button>
+    <button class="chip" data-v="90">90 min</button>
+  </div>
+
+  <h2>Breathing pace</h2>
+  <p class="muted">Box breathing: in, hold, out, hold. Seconds for each step.</p>
+  <div class="row" id="breathRow">
+    <button class="chip" data-v="4">4 seconds</button>
+    <button class="chip sel" data-v="5">5 seconds</button>
+    <button class="chip" data-v="6">6 seconds</button>
+  </div>
+
+  <h2>Voice during the journey</h2>
+  <div class="row" id="cueRow">
+    <button class="chip" data-v="few">Very few</button>
+    <button class="chip sel" data-v="some">Gentle check-ins</button>
+  </div>
+
+  <h2>Ending</h2>
+  <div class="row" id="endRow">
+    <button class="chip sel" data-v="return">Return and reflect</button>
+    <button class="chip" data-v="rest">Rest and drift off</button>
+  </div>
+
+  <details style="margin-top:22px" open>
+    <summary class="muted sans" style="cursor:pointer">Sound</summary>
+    <div class="snd" data-prefix="">
+      <label>Voice volume</label><input type="range" id="voiceVol" min="20" max="100" value="90">
+      <label>Music volume</label><input type="range" id="musicVol" min="0" max="100" value="55">
+      <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" id="voiceTone" min="-100" max="100" value="0">
+      <label>Music tone <span>softer ↔ airier</span></label><input type="range" id="musicTone" min="0" max="100" value="45">
+      <label>Music dip while the voice speaks <span>none ↔ strong</span></label><input type="range" id="duckAmt" min="0" max="100" value="60">
+    </div>
+    <button class="btn ghost" id="testBtn" style="margin-top:16px">Test voice and music</button>
+  </details>
+
+  <button class="btn" id="startBtn" disabled>Loading audio…</button>
+  <p class="muted sans" style="text-align:center;margin-top:12px;font-size:13px">Leave this page open. The screen goes dark but stays on, so the sound keeps playing.</p>
+  <p class="discFoot">Personal hobby project · Not medical advice, therapy or treatment · <a href="disclaimer.html">Disclaimer</a></p>
+</section>
+
+<!-- 2. Session -->
+<section class="screen" id="session">
+  <div id="phaseLbl"></div>
+  <div id="orb"></div>
+  <svg id="bRing" viewBox="-170 -170 340 340" aria-hidden="true"><defs><filter id="ringGlow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle id="bCircle" cx="0" cy="0" r="62" fill="none" stroke="rgba(242,208,170,.62)" stroke-width="1.4" filter="url(#ringGlow)"/></svg>
+  <div id="breathLbl"><span id="bWord"></span><span id="bCount"></span></div>
+  <svg id="ring" viewBox="0 0 150 150"><circle cx="75" cy="75" r="70" fill="none" stroke="#e0b48a" stroke-width="2" stroke-dasharray="440" stroke-dashoffset="440" id="ringC" transform="rotate(-90 75 75)"/></svg>
+  <div id="caption"></div>
+  <div id="tapGate">
+    <div class="big">Tap anywhere<br>once you’ve taken your medicine</div>
+    <div class="small">Then lie back. The guide takes it from there.</div>
+  </div>
+  <div id="hold">press and hold to pause</div>
+  <div id="pausedLayer">
+    <p style="color:#9a968e;text-align:center">Paused. You’re safe. You’re in your bed.</p>
+    <div class="pvol snd">
+      <label>Voice</label><select id="pVoiceSel" class="pvsel"></select><span id="pVoiceMsg" class="pvmsg"></span>
+      <label>Voice volume</label><input type="range" data-mirror="voiceVol" min="20" max="100">
+      <label>Music volume</label><input type="range" data-mirror="musicVol" min="0" max="100">
+      <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" data-mirror="voiceTone" min="-100" max="100">
+      <label>Music tone <span>softer ↔ airier</span></label><input type="range" data-mirror="musicTone" min="0" max="100">
+      <label>Music dip <span>none ↔ strong</span></label><input type="range" data-mirror="duckAmt" min="0" max="100">
+    </div>
+    <button class="btn" id="resumeBtn">Resume</button>
+    <button class="btn ghost" id="endBtn">End session</button>
+  </div>
+</section>
+
+<!-- 3. Integrate -->
+<section class="screen" id="after">
+  <h1>Welcome back</h1>
+  <p class="muted">Stay lying down for now. When you do get up, go slowly, with your monitor’s help. No driving today.</p>
+  <h2>Notes while it’s fresh</h2>
+  <p class="muted">Write a few words, or come back to this later. Bring it to your next integration session.</p>
+  <p class="sans" style="font-size:15px;color:var(--dim)">• What images, feelings or sensations came up?<br>• Was there a moment that felt important?<br>• What do you want to remember?<br>• How does your intention feel now?</p>
+  <textarea id="journal" style="min-height:200px" placeholder="Anything at all…"></textarea>
+  <button class="btn ghost" id="copyBtn">Copy notes</button>
+  <p class="muted sans" style="font-size:13px;margin-top:8px">Notes are saved only in this browser on this device.</p>
+  <button class="btn ghost" id="againBtn" style="margin-top:30px">Back to start</button>
+</section>
+
+<script>
+(() => {
+"use strict";
+const $ = s => document.querySelector(s);
+const store = {
+  get(k){ try{ return localStorage.getItem(k) }catch(e){ return null } },
+  set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} }
+};
+
+/* ---------- Settings UI ---------- */
+const settings = { len: 60, cues: "some", end: "return", breath: 5 };
+function chipGroup(id, key, num){
+  const row = $(id);
+  row.addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if(!b) return;
+    row.querySelectorAll(".chip").forEach(c => c.classList.toggle("sel", c===b));
+    settings[key] = num ? +b.dataset.v : b.dataset.v;
+    store.set("kap_"+key, b.dataset.v);
+  });
+  const saved = store.get("kap_"+key);
+  if(saved){ const b = row.querySelector(`[data-v="${saved}"]`); if(b) b.click(); }
+}
+chipGroup("#lenRow","len",true); chipGroup("#breathRow","breath",true); chipGroup("#cueRow","cues"); chipGroup("#endRow","end");
+$("#intention").value = store.get("kap_intention") || "";
+$("#intention").addEventListener("input", e => store.set("kap_intention", e.target.value));
+$("#journal").value = store.get("kap_journal") || "";
+$("#journal").addEventListener("input", e => store.set("kap_journal", e.target.value));
+["musicVol","voiceVol","voiceTone","musicTone","duckAmt"].forEach(id => {
+  const v = store.get("kap_"+id); if(v) $("#"+id).value = v;
+  $("#"+id).addEventListener("input", e => store.set("kap_"+id, e.target.value));
+});
+
+/* ---------- Audio engine: pre-recorded voice + seamless ambient loop ---------- */
+const VOICES = [
+  {id:"sulafatn",   name:"Sulafat", d:"Warm, natural, human · guided box breathing", breath:true},
+  {id:"gacruxn",    name:"Gacrux",  d:"Mature, natural, human · guided box breathing", breath:true},
+  {id:"sagecalmp",  name:"Sage · calmest", d:"Slower, lower, deeply peaceful · guided box breathing", breath:true},
+  {id:"avabright",  name:"Ava · bright", d:"Bright, calm and clear · guided box breathing", breath:true},
+  {id:"sagep",      name:"Sage · warm",    d:"Warm and present"},
+  {id:"balladp",    name:"Ballad",     d:"Calm, warm man"},
+  {id:"gacruxp",    name:"Gacrux",     d:"Mature woman, soft and hushed"},
+  {id:"algenibp",   name:"Algenib",    d:"Older man, gravelly, soft and hushed"},
+  {id:"sadaltagerp",name:"Sadaltager", d:"Older man, steady, soft and hushed"},
+  {id:"soniap",     name:"Sonia",      d:"Calm, British woman"},
+  {id:"libbyp",     name:"Libby",      d:"Soft, kind, British woman"},
+  {id:"jennyp",     name:"Jenny",      d:"Soft, comforting, American woman"},
+  {id:"avasoftp",   name:"Ava (hushed)", d:"Tender, intimate, American woman"},
+  {id:"avap",       name:"Ava",        d:"Warm, American woman"},
+  {id:"emmap",      name:"Emma",       d:"Gentle, American woman"},
+  {id:"andrewp",    name:"Andrew",     d:"Warm, steady, American man"},
+  {id:"ryanp",      name:"Ryan",       d:"Grounded, British man"},
+];
+const SHARED = ["ambient2","bell2"];
+const BREATH = ["breathIntro","bIn","bHold","bOut","breathOutro"];
+const hasBreath = v => !!(VOICES.find(x => x.id === v) || {}).breath;
+const clipsFor = v => hasBreath(v) ? CLIPS.filter(c => c !== "prep2").concat(BREATH) : CLIPS;
+const CLIPS = ["test","nudge","prep1","prep2","prep3","prep4","prep5","prep6","onset1","onset2",
+  "c1","c2","c3","c4","c5","c6","c7","c8","c9","r1","r2","r3","r4","endReturn","endRest"];
+let voiceId = store.get("kap_voice13") || "sulafatn";
+if(!VOICES.some(v => v.id === voiceId)) voiceId = "sulafatn";
+const audio = (() => {
+  let ctx, master, music, duck, voice, vLow, vHigh, mLP, analyser, loopSrc = null; const buf = {}; const loads = {}; let lvBuf = null; let speaking = 0; const scheduled = [];
+  function ensure(){
+    if(ctx) return;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.connect(ctx.destination);
+    music = ctx.createGain(); music.gain.value = 0;
+    duck = ctx.createGain(); mLP = ctx.createBiquadFilter(); mLP.type = "lowpass"; mLP.Q.value = 0.5;
+    music.connect(duck); duck.connect(mLP); mLP.connect(master);
+    voice = ctx.createGain();
+    vLow = ctx.createBiquadFilter(); vLow.type = "lowshelf"; vLow.frequency.value = 220;
+    vHigh = ctx.createBiquadFilter(); vHigh.type = "highshelf"; vHigh.frequency.value = 3800;
+    voice.connect(vLow); vLow.connect(vHigh); vHigh.connect(master);
+    analyser = ctx.createAnalyser(); analyser.fftSize = 1024; analyser.smoothingTimeConstant = 0.6; voice.connect(analyser);
+    lvBuf = new Float32Array(analyser.fftSize);
+    applyVol();
+  }
+  function applyVol(){
+    if(!ctx) return;
+    const t = ctx.currentTime;
+    voice.gain.setTargetAtTime((+$("#voiceVol").value/100), t, 0.05);
+    const vt = (+$("#voiceTone").value)/100;           // -1 warmer ... +1 clearer
+    vLow.gain.setTargetAtTime(vt < 0 ? -vt*5 : -vt*2.5, t, 0.05);
+    vHigh.gain.setTargetAtTime(vt < 0 ? vt*6 : vt*4.5, t, 0.05);
+    const mt = (+$("#musicTone").value)/100;           // 0 softer ... 1 airier
+    mLP.frequency.setTargetAtTime(700 * Math.pow(16000/700, mt), t, 0.05);
+  }
+  function dipLevel(){ return 1 - 0.85 * (+$("#duckAmt").value/100); }
+  function musicTarget(){ return (+$("#musicVol").value/100) * 0.9; }
+  const raw = {};
+  async function fetchSet(paths, onProgress){
+    let n = 0;
+    await Promise.all(paths.map(async p => {
+      if(!raw[p]){ const r = await fetch(p); if(!r.ok) throw new Error(p); raw[p] = await r.arrayBuffer(); }
+      onProgress && onProgress(++n / paths.length);
+    }));
+  }
+  const pathsFor = v => SHARED.map(f => `audio/${f}.mp3`).concat(clipsFor(v).map(f => `audio/${v}/${f}.mp3?s4`));
+  function decode(ab){ return new Promise((res, rej) => { const p = ctx.decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej); }); }
+  return {
+    preload(v, onProgress){ if(!loads[v]) loads[v] = fetchSet(pathsFor(v), onProgress); else onProgress && onProgress(1); return loads[v]; },
+    async unlockAndDecode(){
+      ensure(); try{ await ctx.resume(); }catch(e){}
+      // tiny silent blip inside the tap, required by iOS
+      const s = ctx.createBufferSource(); s.buffer = ctx.createBuffer(1, 1, 22050); s.connect(ctx.destination); s.start(0);
+      await this.preload(voiceId);
+      for(const p of pathsFor(voiceId)){ if(!buf[p]) buf[p] = await decode(raw[p].slice(0)); }
+    },
+    async decodeVoice(v){ await this.preload(v); for(const p of pathsFor(v)){ if(!buf[p]) buf[p] = await decode(raw[p].slice(0)); } },
+    get ctx(){ return ctx; },
+    startMusic(fadeSec=6){
+      if(loopSrc) return;
+      loopSrc = ctx.createBufferSource(); loopSrc.buffer = buf["audio/ambient2.mp3"]; loopSrc.loop = true;
+      const d = loopSrc.buffer.duration; if(d > 300.05){ loopSrc.loopStart = 0; loopSrc.loopEnd = 300; }
+      loopSrc.connect(music); loopSrc.start();
+      music.gain.cancelScheduledValues(ctx.currentTime);
+      music.gain.setValueAtTime(music.gain.value, ctx.currentTime);
+      music.gain.linearRampToValueAtTime(musicTarget(), ctx.currentTime + fadeSec);
+    },
+    setVolume(){ if(!ctx) return; applyVol(); if(speaking) duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 0.3); if(loopSrc) music.gain.setTargetAtTime(musicTarget(), ctx.currentTime, 0.4); },
+    fadeMusic(sec){ if(!ctx) return; const t = ctx.currentTime; music.gain.cancelScheduledValues(t); music.gain.setValueAtTime(music.gain.value, t); music.gain.linearRampToValueAtTime(0, t + sec); },
+    stopMusic(){ if(loopSrc){ try{ loopSrc.stop(ctx.currentTime + 0.5); }catch(e){} music.gain.setTargetAtTime(0, ctx.currentTime, 0.1); loopSrc = null; } },
+    bell(level=1){ const b = buf["audio/bell2.mp3"]; if(!b) return; const s = ctx.createBufferSource(); s.buffer = b; const g = ctx.createGain(); g.gain.value = level; s.connect(g); g.connect(voice); s.start(); },
+    playAt(name, when){
+      const b = buf[`audio/${voiceId}/${name}.mp3?s4`]; if(!b) return;
+      const s = ctx.createBufferSource(); s.buffer = b; s.connect(voice); s.start(when); scheduled.push(s);
+      s.onended = () => { const i = scheduled.indexOf(s); if(i >= 0) scheduled.splice(i, 1); };
+    },
+    stopScheduled(){ scheduled.splice(0).forEach(s => { try{ s.stop(); }catch(e){} }); },
+    play(name){
+      return new Promise(res => {
+        const b = buf[`audio/${voiceId}/${name}.mp3?s4`]; if(!b){ res(); return; }
+        const s = ctx.createBufferSource(); s.buffer = b; s.connect(voice);
+        speaking++; duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 0.8);
+        s.onended = () => { speaking = Math.max(0, speaking-1); if(!speaking) duck.gain.setTargetAtTime(1, ctx.currentTime, 2.5); res(); };
+        s.start(ctx.currentTime + 0.05);
+      });
+    },
+    level(){ if(!analyser || ctx.state !== "running") return 0; analyser.getFloatTimeDomainData(lvBuf); let s = 0; for(let i=0;i<lvBuf.length;i++) s += lvBuf[i]*lvBuf[i]; return Math.min(1, Math.sqrt(s/lvBuf.length) * 5); },
+    pause(){ if(ctx) ctx.suspend(); },
+    resume(){ if(ctx) ctx.resume(); },
+  };
+})();
+// Wait using the audio clock, so pausing (which suspends audio) also pauses the script.
+function wait(sec){
+  const c = audio.ctx; const end = c.currentTime + sec;
+  return new Promise(res => { const iv = setInterval(() => { if(c.currentTime >= end){ clearInterval(iv); res(); } }, 200); });
+}
+function loadVoice(){
+  const want = voiceId, b = $("#startBtn");
+  b.disabled = true; b.textContent = "Loading voice…";
+  audio.preload(want, p => { if(voiceId===want) b.textContent = `Loading voice… ${Math.round(p*100)}%`; })
+    .then(() => { if(voiceId===want){ b.disabled = false; b.textContent = "Begin"; } })
+    .catch(() => { if(voiceId===want) b.textContent = "Couldn’t load audio. Reload the page"; });
+}
+// Voice picker with previews
+const preview = new Audio(); preview.preload = "none";
+const FAVORITES = ["sulafatn","gacruxn","sagep"];
+function voiceBtn(v){ return `<button class="voice${v.id===voiceId?" sel":""}" data-id="${v.id}"><span class="play">▶</span><span><b>${v.name}</b><span class="d">${v.d}</span></span></button>`; }
+function renderVoices(){
+  const favs = FAVORITES.map(id => VOICES.find(v => v.id === id)).filter(Boolean);
+  const others = VOICES.filter(v => !FAVORITES.includes(v.id));
+  const wasOpen = $("#otherVoices") ? $("#otherVoices").open : others.some(v => v.id === voiceId);
+  $("#voiceList").innerHTML = favs.map(voiceBtn).join("") +
+    `<details id="otherVoices" class="others"${wasOpen ? " open" : ""}><summary>Other voices <span>(${others.length})</span></summary><div class="othersInner">${others.map(voiceBtn).join("")}</div></details>`;
+}
+$("#voiceList").addEventListener("click", e => {
+  const el = e.target.closest(".voice"); if(!el) return;
+  voiceId = el.dataset.id; store.set("kap_voice13", voiceId); renderVoices();
+  try{ preview.pause(); preview.src = `audio/${voiceId}/test.mp3?s4`; preview.currentTime = 0; preview.play().catch(()=>{}); }catch(err){}
+  loadVoice();
+});
+renderVoices(); loadVoice();
+
+/* ---------- Session engine ---------- */
+const state = { phase:"idle", paused:false, events:[], j0:0, timer:null, wake:null, run:0 };
+function setPhaseLabel(t){ $("#phaseLbl").textContent = t; }
+function caption(t){ const c=$("#caption"); c.style.opacity = t ? 1 : 0; if(t) c.textContent = t; }
+async function requestWake(){ try{ if("wakeLock" in navigator) state.wake = await navigator.wakeLock.request("screen"); }catch(e){} }
+document.addEventListener("visibilitychange", () => { if(document.visibilityState==="visible" && !["idle","done"].includes(state.phase)) requestWake(); });
+function show(id){ document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id===id)); }
+
+$("#testBtn").addEventListener("click", async () => {
+  try{ preview.pause(); }catch(e){}
+  const b = $("#testBtn"); b.disabled = true;
+  await audio.unlockAndDecode(); audio.startMusic(2); audio.bell();
+  await wait(1.5); await audio.play("test"); await wait(2);
+  audio.fadeMusic(2); await wait(2.2); audio.stopMusic(); b.disabled = false;
+});
+["musicVol","voiceVol","voiceTone","musicTone","duckAmt"].forEach(id => $("#"+id).addEventListener("input", () => audio.setVolume()));
+document.querySelectorAll("[data-mirror]").forEach(el => el.addEventListener("input", e => {
+  const id = el.dataset.mirror; $("#"+id).value = e.target.value; store.set("kap_"+id, e.target.value); audio.setVolume();
+}));
+
+$("#startBtn").addEventListener("click", async () => {
+  try{ preview.pause(); }catch(e){}
+  const b = $("#startBtn"); b.disabled = true; b.textContent = "Starting…";
+  try{ await audio.unlockAndDecode(); }catch(e){ b.textContent = "Audio failed to start. Reload and try again"; return; }
+  requestWake();
+  show("session"); $("#session").classList.add("on");
+  b.disabled = false; b.textContent = "Begin";
+  clearProgress();
+  runPrep(++state.run);
+});
+
+async function runPrep(run, from=0){
+  state.phase = "prep"; setPhaseLabel("Settling");
+  audio.startMusic(8);
+  if(from === 0){ await wait(3); audio.bell(); await wait(6); } else { await wait(4); }
+  const intent = $("#intention").value.trim();
+  const steps = ["prep1","prep2","prep3","prep4","prep5","prep6"];
+  for(let i = from; i < steps.length; i++){
+    const name = steps[i];
+    if(state.run !== run) return;
+    state.prepIndex = i; saveProgress();
+    if(name === "prep4" && intent) caption(intent);
+    if(name === "prep2") await boxBreathing(run);
+    else await audio.play(name);
+    if(name === "prep4") setTimeout(() => caption(""), 6000);
+    await wait(name === "prep2" ? 6 : 4);
+  }
+  if(state.run !== run) return;
+  showGate();
+}
+// Box breathing: 4 in, 4 hold, 4 out, 4 hold. Cues are scheduled on the audio clock so they land exactly on the beat.
+const BOX = { cycles: 4, voiced: 2 };
+async function boxBreathing(run){
+  const voiced = hasBreath(voiceId), T = settings.breath || 5;
+  if(voiced) await audio.play("breathIntro");
+  else { caption("Let's breathe together. Follow the light: in as it grows, hold, out as it softens, hold."); await wait(7); caption(""); }
+  await wait(2);
+  if(state.run !== run) return;
+  const c = audio.ctx, t0 = c.currentTime + 1.0, cues = ["bIn","bHold","bOut","bHold"];
+  state.breath = { t0, T, cycles: BOX.cycles };
+  if(voiced) for(let k = 0; k < BOX.voiced; k++) for(let p = 0; p < 4; p++) audio.playAt(cues[p], t0 + (k*4 + p) * T);
+  await wait(1.0 + BOX.cycles * 4 * T);
+  state.breath = null;
+  if(state.run !== run) return;
+  await wait(2.0);
+  if(voiced) await audio.play("breathOutro");
+}
+function showGate(){
+  state.phase = "gate"; setPhaseLabel("");
+  $("#tapGate").classList.add("on");
+  clearInterval(state.gateNudge);
+  state.gateNudge = setInterval(() => { if(state.phase==="gate" && !state.paused) audio.play("nudge"); }, 180000);
+  saveProgress();
+}
+
+$("#tapGate").addEventListener("click", () => {
+  if(state.phase !== "gate") return;
+  clearInterval(state.gateNudge);
+  $("#tapGate").classList.remove("on");
+  audio.resume(); requestWake();
+  startJourney();
+});
+
+function buildEvents(){
+  const L = settings.len * 60, ev = [];
+  const add = (t, k, n) => ev.push({t, k, n, done:false});
+  add(2, "bell");
+  add(12, "say", "onset1");
+  add(Math.min(150, L*0.06), "say", "onset2");
+  const bodyStart = L*0.12, bodyEnd = L*0.80;
+  const spacing = settings.cues === "few" ? 15*60 : 7*60;
+  const n = Math.max(1, Math.floor((bodyEnd - bodyStart) / spacing));
+  // Journey arc plays in order: opening, going deep, meeting what comes, softening
+  const pool = ["c1","c2","c3","c4","c5","c6","c7","c8","c9"];
+  for(let k=1;k<=n;k++){
+    const idx = n === 1 ? 0 : Math.min(pool.length-1, Math.round((k-1)*(pool.length-1)/(n-1)));
+    add(bodyStart + k*(bodyEnd-bodyStart)/(n+1) + (Math.random()*40-20), "say", pool[idx]);
+  }
+  const r0 = L*0.82;
+  add(r0, "bellSoft");
+  ["r1","r2","r3","r4"].forEach((c,i) => add(r0 + 15 + i*(L*0.14/4), "say", c));
+  add(L, "finish");
+  return ev.sort((a,b) => a.t - b.t);
+}
+function runEvent(ev){
+  if(ev.k === "bell") audio.bell();
+  else if(ev.k === "bellSoft") audio.bell(0.4);
+  else if(ev.k === "say") state.voiceQ = (state.voiceQ || Promise.resolve()).then(() => audio.play(ev.n));
+  else if(ev.k === "finish") finish();
+}
+function startJourney(resume){
+  state.phase = "journey";
+  if(resume){ state.events = resume.events; state.j0 = audio.ctx.currentTime - resume.elapsed; }
+  else { state.events = buildEvents(); state.j0 = audio.ctx.currentTime; }
+  clearInterval(state.timer); state.timer = setInterval(tick, 500);
+  saveProgress();
+}
+function tick(){
+  if(state.phase !== "journey") return;
+  const e = audio.ctx.currentTime - state.j0;   // audio clock: stops while paused
+  for(const ev of state.events) if(!ev.done && e >= ev.t){ ev.done = true; runEvent(ev); }
+}
+async function finish(){
+  state.phase = "closing"; clearInterval(state.timer);
+  const run = state.run;
+  await (state.voiceQ || Promise.resolve());
+  if(settings.end === "rest"){
+    await audio.play("endRest");
+    audio.fadeMusic(240); await wait(242); if(state.run===run){ audio.stopMusic(); state.phase = "done"; clearProgress(); }
+  } else {
+    audio.bell(0.35); await wait(4);
+    await audio.play("endReturn");
+    audio.fadeMusic(60); await wait(10);
+    if(state.run===run && state.phase==="closing") endToAfter();
+  }
+}
+function endToAfter(){
+  clearProgress(); state.breath = null; try{ audio.stopScheduled(); }catch(e){}
+  state.phase = "done"; state.run++; clearInterval(state.timer); clearInterval(state.gateNudge);
+  audio.resume(); audio.fadeMusic(3); setTimeout(() => audio.stopMusic(), 3500);
+  try{ state.wake && state.wake.release(); }catch(e){}
+  $("#session").classList.remove("on"); $("#pausedLayer").classList.remove("on"); $("#tapGate").classList.remove("on");
+  show("after");
+}
+
+/* Orb: a very gentle glow. During box breathing the ring grows and shrinks while the glow stays put and brightens/fades.
+   Every value eases slowly toward its target, so nothing ever jumps. */
+(function orbLoop(){
+  const orb = $("#orb"), ring = $("#bRing"), circ = $("#bCircle"), lbl = $("#breathLbl");
+  const R0 = 62, R1 = 140;                       // ring radius at empty / full lungs (px)
+  let sm = 0, cur = { s: 1, o: 0.5, r: R0, ro: 0, lo: 0 };
+  function frame(t){
+    if($("#session").classList.contains("on") && audio.ctx){
+      const tgt = { s: 1, o: 0.5, r: R0, ro: 0, lo: 0 };
+      const B = state.breath, tt = B ? audio.ctx.currentTime - B.t0 : -1;
+      if(B && tt >= 0 && tt < B.cycles * 4 * B.T){
+        const idx = Math.floor(tt / B.T), ph = idx % 4, pr = (tt - idx * B.T) / B.T, e = 0.5 - 0.5 * Math.cos(Math.PI * pr);
+        const f = ph === 0 ? e : ph === 1 ? 1 : ph === 2 ? 1 - e : 0;      // 0 = empty, 1 = full
+        tgt.o = 0.25 + 0.7 * f; tgt.r = R0 + (R1 - R0) * f; tgt.ro = 1; tgt.lo = 1;
+        $("#bWord").textContent = ["Breathe in","Hold","Breathe out","Hold"][ph];
+        $("#bCount").textContent = String(Math.min(B.T, Math.floor(pr * B.T) + 1));
+        // the breath itself is already smooth; follow it closely so the ring stays on the beat
+        cur.r = tgt.r; cur.o += (tgt.o - cur.o) * 0.25;
+      } else {
+        const lv = audio.level();
+        sm += (lv - sm) * (lv > sm ? 0.08 : 0.02);                       // gentle rise, slow fall
+        const breath = 0.5 + 0.5 * Math.sin(t / 1000 * 2 * Math.PI / 12);  // one slow ambient breath every 12 s
+        tgt.s = 0.96 + breath * 0.04 + sm * 0.22;                          // swells softly with her voice
+        tgt.o = 0.32 + breath * 0.08 + sm * 0.55;                          // and clearly brightens when she speaks
+        cur.r += (tgt.r - cur.r) * 0.02; cur.o += (tgt.o - cur.o) * 0.03;
+      }
+      cur.s += (tgt.s - cur.s) * 0.03;
+      cur.ro += (tgt.ro - cur.ro) * 0.02; cur.lo += (tgt.lo - cur.lo) * 0.02;
+      orb.style.transform = `scale(${cur.s.toFixed(4)})`; orb.style.opacity = cur.o.toFixed(3);
+      circ.setAttribute("r", cur.r.toFixed(2)); ring.style.opacity = cur.ro.toFixed(3);
+      lbl.style.opacity = cur.lo.toFixed(3);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- Press-and-hold to pause (prevents accidental taps) ---------- */
+let holdTimer = null, holdStart = 0, holdRaf = 0;
+const HOLD_MS = 1800;
+function holdBegin(e){
+  if(state.phase==="gate" || state.phase==="idle" || state.phase==="done" || state.paused) return;
+  if(e.target.closest("#pausedLayer")) return;
+  holdStart = performance.now(); $("#ring").style.opacity = 1;
+  const c = $("#ringC");
+  const step = () => {
+    const p = Math.min(1, (performance.now()-holdStart)/HOLD_MS);
+    c.style.strokeDashoffset = 440*(1-p);
+    if(p >= 1){ holdEnd(); doPause(); return; }
+    holdRaf = requestAnimationFrame(step);
+  };
+  holdRaf = requestAnimationFrame(step);
+}
+function holdEnd(){ cancelAnimationFrame(holdRaf); $("#ring").style.opacity = 0; $("#ringC").style.strokeDashoffset = 440; }
+const sess = $("#session");
+sess.addEventListener("pointerdown", holdBegin);
+["pointerup","pointercancel","pointerleave"].forEach(ev => sess.addEventListener(ev, holdEnd));
+sess.addEventListener("contextmenu", e => e.preventDefault());
+
+function doPause(){
+  if(state.paused) return;
+  state.paused = true; audio.pause();
+  document.querySelectorAll("[data-mirror]").forEach(el => el.value = $("#"+el.dataset.mirror).value);
+  const sel = $("#pVoiceSel"), favs = FAVORITES.map(id => VOICES.find(v => v.id === id)).filter(Boolean), others = VOICES.filter(v => !FAVORITES.includes(v.id));
+  sel.innerHTML = `<optgroup label="Favorites">${favs.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</optgroup><optgroup label="Other voices">${others.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</optgroup>`;
+  sel.value = voiceId; $("#pVoiceMsg").textContent = "";
+  $("#pausedLayer").classList.add("on");
+}
+$("#pVoiceSel").addEventListener("change", async e => {
+  const id = e.target.value, msg = $("#pVoiceMsg"), btn = $("#resumeBtn");
+  msg.textContent = "Loading voice…"; btn.disabled = true;
+  try{ await audio.decodeVoice(id); voiceId = id; store.set("kap_voice13", id); renderVoices(); msg.textContent = "Voice changed. It will be used from here on."; }
+  catch(err){ msg.textContent = "Couldn’t load that voice. Staying with the current one."; e.target.value = voiceId; }
+  btn.disabled = false;
+});
+$("#resumeBtn").addEventListener("click", () => {
+  $("#pausedLayer").classList.remove("on");
+  state.paused = false; audio.resume(); requestWake();
+});
+$("#endBtn").addEventListener("click", () => { state.paused=false; endToAfter(); });
+
+/* ---------- After ---------- */
+$("#copyBtn").addEventListener("click", async () => {
+  const txt = `Session notes, ${new Date().toLocaleString()}\nIntention: ${$("#intention").value}\n\n${$("#journal").value}`;
+  try{ await navigator.clipboard.writeText(txt); $("#copyBtn").textContent = "Copied"; }
+  catch(e){ $("#journal").select(); $("#copyBtn").textContent = "Select-all done. Use Copy"; }
+  setTimeout(()=> $("#copyBtn").textContent = "Copy notes", 2500);
+});
+$("#againBtn").addEventListener("click", () => { state.phase="idle"; show("prep"); window.scrollTo(0,0); });
+
+/* ---------- Save & resume ---------- */
+const SAVE_KEY = "kap_session_v2";
+function saveProgress(){
+  if(!["prep","gate","journey","closing"].includes(state.phase)) return;
+  const s = { phase: state.phase, voice: voiceId, len: settings.len, cues: settings.cues, end: settings.end,
+    prepIndex: state.prepIndex || 0,
+    elapsed: state.phase === "journey" && audio.ctx ? audio.ctx.currentTime - state.j0 : 0,
+    events: state.phase === "journey" ? state.events : [], savedAt: Date.now() };
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function clearProgress(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
+function loadProgress(){
+  try{ const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if(s && Date.now() - s.savedAt < 8*3600e3) return s; }catch(e){}
+  return null;
+}
+setInterval(saveProgress, 3000);
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "hidden") saveProgress(); });
+window.addEventListener("pagehide", saveProgress);
+
+const savedSession = loadProgress();
+if(savedSession){
+  const s = savedSession;
+  const mins = Math.max(0, Math.round((Date.now() - s.savedAt)/60000));
+  const ago = mins < 1 ? "just now" : mins === 1 ? "1 minute ago" : mins < 60 ? `${mins} minutes ago` : `${Math.round(mins/60)} hours ago`;
+  const where = s.phase === "journey" ? `${Math.floor(s.elapsed/60)} of ${s.len} minutes into the journey`
+    : s.phase === "gate" ? "waiting for you to take your medicine"
+    : s.phase === "closing" ? "at the ending" : "while settling in";
+  $("#resumeWhere").textContent = `Stopped ${where}, ${ago}.`;
+  $("#resumeCard").style.display = "block";
+}
+$("#resumeSessionBtn").addEventListener("click", async () => {
+  const s = savedSession; if(!s) return;
+  const b = $("#resumeSessionBtn"); b.disabled = true; b.textContent = "Loading…";
+  try{ preview.pause(); }catch(e){}
+  settings.len = s.len; settings.cues = s.cues; settings.end = s.end;
+  if(VOICES.some(v => v.id === s.voice)) voiceId = s.voice;
+  try{ await audio.unlockAndDecode(); }catch(e){ b.disabled = false; b.textContent = "Couldn’t load audio. Try again"; return; }
+  requestWake();
+  $("#resumeCard").style.display = "none";
+  show("session"); $("#session").classList.add("on");
+  const run = ++state.run;
+  if(s.phase === "prep"){ runPrep(run, s.prepIndex || 0); return; }
+  audio.startMusic(6);
+  if(s.phase === "gate"){ showGate(); }
+  else if(s.phase === "journey"){ await wait(3); audio.bell(); startJourney({ events: s.events, elapsed: s.elapsed }); }
+  else { await wait(3); finish(); }
+});
+$("#freshBtn").addEventListener("click", () => { clearProgress(); $("#resumeCard").style.display = "none"; });
+
+// Gentle switch between KAP and EMDR: fade out, then load the other page (which fades in)
+document.querySelectorAll(".modes a").forEach(a => a.addEventListener("click", e => {
+  if(a.classList.contains("on")) { e.preventDefault(); return; }
+  e.preventDefault(); document.body.classList.add("leaving");
+  setTimeout(() => { location.href = a.getAttribute("href"); }, 900);
+}));
+
+// Debug hook for testing: ?fast is not passed through artifacts, so expose on window
+window.__kap = { state, settings, audio, boxBreathing };
+})();
+</script>
+<!-- ===== Disclaimer gate (shared by KAP and EMDR pages) ===== -->
+<style>
+  #discGate{position:fixed;inset:0;z-index:9999;background:#08070e;display:none;overflow:auto;padding:calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 30px);animation:dgIn 1.2s ease both;font:15.5px/1.55 ui-sans-serif,-apple-system,system-ui,sans-serif;color:#e6e1d8}
+  #discGate.on{display:block}
+  @keyframes dgIn{from{opacity:0}to{opacity:1}}
+  #discGate .wrap{max-width:540px;margin:0 auto}
+  #discGate .tag{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#e39a7f;border:1px solid #e39a7f;border-radius:999px;padding:4px 10px}
+  #discGate h1{font:400 27px/1.2 ui-serif,Georgia,serif;margin:14px 0 10px;color:#f1e7da}
+  #discGate .big{font-size:17px;color:#f3d9c5;margin:0 0 14px}
+  #discGate ul{padding-left:20px;margin:0 0 16px}
+  #discGate li{margin:8px 0;color:#d8d2c8}
+  #discGate li b{color:#f1e7da}
+  #discGate .crisis{border:1.5px solid #e39a7f;background:rgba(227,154,127,.10);border-radius:14px;padding:12px 14px;margin:14px 0;color:#f3d9c5}
+  #discGate label{display:flex;gap:12px;align-items:flex-start;margin:12px 0;cursor:pointer;color:#e6e1d8}
+  #discGate input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:#e0b48a}
+  #discGate button{display:block;width:100%;margin-top:16px;padding:16px;border:0;border-radius:14px;background:#e0b48a;color:#1a1209;font:600 16px ui-sans-serif,system-ui,sans-serif}
+  #discGate button:disabled{opacity:.35}
+  #discGate a{color:#e0b48a}
+  .discBanner{display:block;margin:0 0 16px;padding:11px 14px;border:1.5px solid #e39a7f;border-radius:12px;background:rgba(227,154,127,.10);color:#f3d9c5;font:14px/1.45 ui-sans-serif,system-ui,sans-serif;text-decoration:none}
+  .discBanner b{color:#f7e3d3}
+  .discFoot{display:block;text-align:center;margin:26px 0 8px;color:#9a94a6;font:13px ui-sans-serif,system-ui,sans-serif}
+  .discFoot a{color:#e0b48a}
+</style>
+<div id="discGate" role="dialog" aria-modal="true" aria-labelledby="dgTitle">
+  <div class="wrap">
+    <span class="tag">Please read before using</span>
+    <h1 id="dgTitle">This is a personal project, not medical care</h1>
+    <p class="big">I made this for my own use and am sharing it with friends for feedback. It is <b>not medical advice, not therapy, not treatment</b>, and <b>not a medical device</b>.</p>
+    <ul>
+      <li><b>Not reviewed by any doctor, therapist or clinician.</b> Not affiliated with any clinic or provider.</li>
+      <li><b>No dosing or medication guidance.</b> Take ketamine only exactly as prescribed, under your care team's supervision, with a monitor present if they require one.</li>
+      <li><b>Not a substitute for professional care.</b> EMDR should be done with a trained, licensed clinician. Don't use the EMDR section for trauma or under the influence of any substance, including ketamine.</li>
+      <li><b>It does not monitor you</b> and cannot call for help.</li>
+      <li><b>The voices are AI-generated</b>, not real people.</li>
+      <li><b>Use entirely at your own risk.</b> Provided "as is", with no warranty of any kind. Adults 18+ only.</li>
+    </ul>
+    <div class="crisis"><b>In crisis or thinking about harming yourself?</b> Call or text <b>988</b> (US Suicide &amp; Crisis Lifeline). In an emergency, call <b>911</b>.</div>
+    <label><input type="checkbox" class="dgc"> I understand this is not medical advice, therapy or treatment, and I use it at my own risk.</label>
+    <label><input type="checkbox" class="dgc"> I am 18 or older.</label>
+    <p style="margin:10px 0 0"><a href="disclaimer.html">Read the full disclaimer</a></p>
+    <button id="dgGo" disabled>I understand, continue</button>
+  </div>
+</div>
+<script>
+(function(){
+  const KEY = "app_disclaimer_ack_v1", DAYS = 30;
+  let ok = false; try{ const t = +localStorage.getItem(KEY); ok = t && (Date.now() - t) < DAYS*864e5; }catch(e){}
+  const g = document.getElementById("discGate");
+  if(!ok){ g.classList.add("on"); document.documentElement.style.overflow = "hidden"; }
+  const boxes = [...g.querySelectorAll(".dgc")], go = document.getElementById("dgGo");
+  boxes.forEach(b => b.onchange = () => go.disabled = !boxes.every(x => x.checked));
+  go.onclick = () => { try{ localStorage.setItem(KEY, Date.now()); }catch(e){} g.style.transition = "opacity 1s ease"; g.style.opacity = 0;
+    setTimeout(() => { g.classList.remove("on"); g.style.opacity = ""; document.documentElement.style.overflow = ""; }, 1000); };
+})();
+</script>
+
+</body>
+</html>
