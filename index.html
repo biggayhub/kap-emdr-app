@@ -86,7 +86,7 @@
   .sheetHead{display:flex;justify-content:space-between;align-items:center;font:15px ui-sans-serif,system-ui,sans-serif;color:#e6e1d8}
   .sheetHead button{background:#2a2333;color:#e0b48a;border:0;border-radius:999px;padding:8px 16px;font:14px ui-sans-serif,system-ui,sans-serif}
   .sheetNote{color:#6d6680;font:12px ui-sans-serif,system-ui,sans-serif;margin:10px 0 2px;text-align:center}
-  .pvol{width:100%;max-width:320px;margin:4px 0 10px;max-height:52vh;overflow:auto}
+  .pvol{width:100%;max-width:380px;text-align:left;margin:4px 0 10px;max-height:52vh;overflow:auto}
   .snd label{display:flex;justify-content:space-between;align-items:baseline;color:var(--dim);font:14px ui-sans-serif,system-ui,sans-serif;margin:16px 0 4px}
   .pvsel{width:100%;background:#15131f;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:15px ui-sans-serif,system-ui,sans-serif;padding:10px}
   .pvmsg{display:block;min-height:1.2em;margin-top:6px;color:var(--dim);font:13px ui-sans-serif,system-ui,sans-serif}
@@ -94,6 +94,28 @@
   .snd input{width:100%;height:30px;accent-color:var(--accent)}
   .pvol label{display:block;color:#8a8780;font:14px ui-sans-serif,system-ui,sans-serif;margin:14px 0 4px}
   .pvol input{width:100%;height:32px;accent-color:#c9a46a}
+  /* layman sound panel */
+  .moods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 2px}
+  .mood{text-align:left;padding:12px 14px;border-radius:14px;border:1px solid var(--faint);background:none;color:var(--ink);font:15px ui-sans-serif,-apple-system,system-ui,sans-serif;transition:border-color .7s ease,background .7s ease}
+  .mood b{display:block;font-weight:500;transition:color .7s ease}
+  .mood span{display:block;font-size:12px;color:var(--dim);margin-top:3px}
+  .mood.sel{border-color:var(--accent);background:rgba(224,180,138,.08)}
+  .mood.sel b{color:var(--accent)}
+  .mood:last-child:nth-child(odd){grid-column:1/-1}
+  .mixNote{font:12px ui-sans-serif,system-ui,sans-serif;color:var(--dim);min-height:1.4em;margin:8px 2px 0;transition:opacity .7s ease}
+  .ctlHead{font:13px ui-sans-serif,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:22px 0 0;opacity:.8}
+  .ctl{margin:16px 0 0}
+  .ctlName{font:15px ui-sans-serif,-apple-system,system-ui,sans-serif;color:var(--ink)}
+  .ctlName small{display:block;font-size:12px;color:var(--dim);margin-top:2px}
+  .ends{display:flex;justify-content:space-between;font:12px ui-sans-serif,system-ui,sans-serif;color:var(--dim);margin-top:0}
+  .sndPanel input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:36px;background:transparent;margin:4px 0 0;padding:0}
+  .sndPanel input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:rgba(255,255,255,.13)}
+  .sndPanel input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--accent);margin-top:-11px;box-shadow:0 0 0 7px rgba(224,180,138,.13);border:0}
+  .sndPanel input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:rgba(255,255,255,.13)}
+  .sndPanel input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--accent);border:0;box-shadow:0 0 0 7px rgba(224,180,138,.13)}
+  .resetSnd{display:block;margin:20px auto 4px;background:none;border:0;color:var(--dim);text-decoration:underline;text-underline-offset:3px;font:13px ui-sans-serif,system-ui,sans-serif;padding:8px}
+  #testBtn.on{border-color:var(--accent);color:var(--accent)}
+  .sheetIn{max-height:80vh;overflow:auto}
   .modes{display:flex;gap:4px;padding:4px;margin:4px 0 14px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.02)}
   .modes a{flex:1;text-align:center;padding:9px 10px;border-radius:999px;color:var(--dim);text-decoration:none;font:500 14px ui-sans-serif,system-ui,sans-serif;transition:background .8s ease,color .8s ease}
   .modes a.on{background:#2a2333;color:var(--accent)}
@@ -166,17 +188,15 @@
     <button class="chip" data-v="rest">Rest and drift off</button>
   </div>
 
-  <details style="margin-top:22px" open>
-    <summary class="muted sans" style="cursor:pointer">Sound</summary>
-    <div class="snd" data-prefix="">
-      <label>Voice volume</label><input type="range" id="voiceVol" min="0" max="100" value="72">
-      <label>Music volume</label><input type="range" id="musicVol" min="0" max="100" value="55">
-      <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" id="voiceTone" min="-100" max="100" value="0">
-      <label>Music tone <span>softer ↔ airier</span></label><input type="range" id="musicTone" min="0" max="100" value="50">
-      <label>Music dip while the voice speaks <span>none ↔ strong</span></label><input type="range" id="duckAmt" min="0" max="100" value="30">
-    </div>
-    <button class="btn ghost" id="testBtn" style="margin-top:16px">Test voice and music</button>
-  </details>
+  <h2>Sound</h2>
+  <p class="muted sans" style="font-size:14px">Pick a feel, then fine-tune if you like. Tap <b>Listen while you adjust</b> to hear every change as you make it. Everything saves on its own.</p>
+  <button class="btn ghost" id="testBtn" style="margin:10px 0 4px">▶&nbsp; Listen while you adjust</button>
+  <div class="sndPanel"></div>
+  <div id="sndMaster" hidden>
+    <input type="range" id="voiceVol" min="0" max="100" value="72"><input type="range" id="voiceTone" min="-100" max="100" value="-20">
+    <input type="range" id="softAmt" min="0" max="100" value="45"><input type="range" id="musicVol" min="0" max="100" value="55">
+    <input type="range" id="musicTone" min="0" max="100" value="40"><input type="range" id="duckAmt" min="0" max="100" value="30">
+  </div>
 
   <button class="btn" id="startBtn" disabled>Loading audio…</button>
   <p class="muted sans" style="text-align:center;margin-top:12px;font-size:13px">Leave this page open. The screen goes dark but stays on, so the sound keeps playing.</p>
@@ -199,12 +219,8 @@
   <div id="sndSheet">
     <div class="sheetIn snd">
       <div class="sheetHead"><b>Sound</b><button id="sndClose">Done</button></div>
-      <label>Voice volume</label><input type="range" data-mirror="voiceVol" min="0" max="100">
-      <label>Music volume</label><input type="range" data-mirror="musicVol" min="0" max="100">
-      <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" data-mirror="voiceTone" min="-100" max="100">
-      <label>Music tone <span>softer ↔ airier</span></label><input type="range" data-mirror="musicTone" min="0" max="100">
-      <label>Music dip <span>none ↔ strong</span></label><input type="range" data-mirror="duckAmt" min="0" max="100">
-      <p class="sheetNote">Changes are instant. The session keeps playing.</p>
+      <div class="sndPanel"></div>
+      <p class="sheetNote">Changes are instant and saved. The session keeps playing.</p>
     </div>
   </div>
   <div id="hold">press and hold to pause</div>
@@ -212,11 +228,7 @@
     <p style="color:#9a968e;text-align:center">Paused. You’re safe. You’re in your bed.</p>
     <div class="pvol snd">
       <label>Voice</label><select id="pVoiceSel" class="pvsel"></select><span id="pVoiceMsg" class="pvmsg"></span>
-      <label>Voice volume</label><input type="range" data-mirror="voiceVol" min="0" max="100">
-      <label>Music volume</label><input type="range" data-mirror="musicVol" min="0" max="100">
-      <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" data-mirror="voiceTone" min="-100" max="100">
-      <label>Music tone <span>softer ↔ airier</span></label><input type="range" data-mirror="musicTone" min="0" max="100">
-      <label>Music dip <span>none ↔ strong</span></label><input type="range" data-mirror="duckAmt" min="0" max="100">
+      <div class="sndPanel"></div>
     </div>
     <button class="btn" id="resumeBtn">Resume</button>
     <button class="btn ghost" id="endBtn">End session</button>
@@ -263,8 +275,9 @@ $("#intention").value = store.get("kap_intention") || "";
 $("#intention").addEventListener("input", e => store.set("kap_intention", e.target.value));
 $("#journal").value = store.get("kap_journal") || "";
 $("#journal").addEventListener("input", e => store.set("kap_journal", e.target.value));
-if(store.get("kap_sound_v2") !== "1"){ ["musicVol","voiceVol","duckAmt","musicTone"].forEach(id => { try{ localStorage.removeItem("kap_"+id); }catch(e){} }); store.set("kap_sound_v2","1"); }
-["musicVol","voiceVol","voiceTone","musicTone","duckAmt"].forEach(id => {
+const SND_IDS = ["voiceVol","voiceTone","softAmt","musicVol","musicTone","duckAmt"];
+if(store.get("kap_sound_v3") !== "1"){ SND_IDS.forEach(id => { try{ localStorage.removeItem("kap_"+id); }catch(e){} }); store.set("kap_sound_v3","1"); }
+SND_IDS.forEach(id => {
   const v = store.get("kap_"+id); if(v) $("#"+id).value = v;
   $("#"+id).addEventListener("input", e => store.set("kap_"+id, e.target.value));
 });
@@ -300,7 +313,7 @@ if(!VOICES.some(v => v.id === voiceId)) voiceId = "sulafatn";
 const audio = (() => {
   const LG = {"jennyp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.7,"test":-2.7,"r2":-2.7,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.7},"libby":{"c8":-5.0,"prep3":-5.0,"c9":-5.0,"c1":-5.4,"prep1":-4.4,"endReturn":-4.6,"c5":-4.7,"test":-4.8,"r2":-4.9,"r3":-4.6,"endRest":-4.8,"prep2":-5.0,"onset2":-4.3,"c4":-4.4,"c7":-4.8,"c6":-5.0,"c3":-4.6,"r1":-4.8,"r4":-4.5,"prep4":-4.2,"nudge":-4.7,"prep6":-4.4,"prep5":-4.5,"onset1":-4.7,"c2":-4.5},"soniap":{"c8":-2.6,"prep3":-2.6,"c9":-2.5,"c1":-2.8,"prep1":-2.7,"endReturn":-2.7,"c5":-2.7,"test":-2.8,"r2":-2.6,"r3":-2.6,"endRest":-2.6,"prep2":-2.5,"onset2":-2.4,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.7,"r4":-2.7,"prep4":-2.7,"nudge":-2.4,"prep6":-2.7,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"andrew":{"c8":-4.6,"prep3":-4.8,"c9":-5.6,"c1":-5.1,"prep1":-4.2,"endReturn":-4.6,"c5":-5.2,"test":-4.4,"r2":-5.4,"r3":-4.8,"endRest":-4.6,"prep2":-5.1,"onset2":-4.8,"c4":-5.1,"c7":-4.9,"c6":-6,"c3":-4.8,"r1":-6,"r4":-4.4,"prep4":-4.6,"nudge":-5.0,"prep6":-4.3,"prep5":-4.1,"onset1":-4.6,"c2":-4.9},"ryan":{"c8":-5.5,"prep3":-4.8,"c9":-5.3,"c1":-4.9,"prep1":-4.0,"endReturn":-4.7,"c5":-4.3,"test":-4.3,"r2":-5.1,"r3":-4.6,"endRest":-4.9,"prep2":-4.9,"onset2":-4.4,"c4":-4.9,"c7":-4.8,"c6":-4.9,"c3":-4.3,"r1":-5.0,"r4":-4.9,"prep4":-4.5,"nudge":-4.7,"prep6":-4.4,"prep5":-4.0,"onset1":-4.5,"c2":-4.7},"libbyp":{"c8":-2.7,"prep3":-2.7,"c9":-2.6,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.6,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.7,"c6":-2.6,"c3":-2.6,"r1":-2.5,"r4":-2.7,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.7,"onset1":-2.6,"c2":-2.8},"ava":{"c8":-5.6,"prep3":-4.8,"c9":-4.7,"c1":-4.8,"prep1":-4.4,"endReturn":-4.4,"c5":-5.1,"test":-4.5,"r2":-5.4,"r3":-4.7,"endRest":-4.9,"prep2":-5.2,"onset2":-4.9,"c4":-5.5,"c7":-4.8,"c6":-5.7,"c3":-4.4,"r1":-5.6,"r4":-4.9,"prep4":-4.3,"nudge":-4.8,"prep6":-4.1,"prep5":-4.4,"onset1":-5.0,"c2":-4.7},"algenibp":{"c8":-2.6,"prep3":-2.5,"c9":-2.6,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.7,"r2":-2.5,"r3":-2.6,"endRest":-2.5,"prep2":-2.6,"onset2":-2.5,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.6,"r1":-2.5,"r4":-2.6,"prep4":-2.6,"nudge":-2.7,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"gacrux":{"c8":-1.1,"prep3":0.9,"c9":-3.3,"c1":-1.5,"prep1":-1.2,"endReturn":-2.3,"c5":-2.5,"test":-1.6,"r2":-2.1,"r3":-2.1,"endRest":-1.1,"prep2":-3.0,"onset2":0.5,"c4":0.3,"c7":-0.6,"c6":-1.7,"c3":-1.3,"r1":-5.1,"r4":0.2,"prep4":-0.6,"nudge":-2.1,"prep6":-1.8,"prep5":-1.5,"onset1":-0.3,"c2":-4.4},"sagecalmp":{"c8":-2.7,"prep3":-2.7,"c9":-2.8,"c1":-2.8,"bHold":3.8,"prep1":-2.7,"endReturn":-2.7,"c5":-2.6,"test":-3.0,"r2":-2.7,"r3":-2.6,"breathOutro":-1.8,"bOut":5.3,"breathIntro":-1.9,"bIn":3.5,"endRest":-2.7,"prep2":-2.6,"onset2":-2.7,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.6,"prep5":-2.6,"onset1":-2.7,"c2":-2.4},"balladp":{"c8":-2.9,"prep3":-2.6,"c9":-2.8,"c1":-2.8,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.9,"r2":-2.6,"r3":-2.8,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.5,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"avap":{"c8":-2.5,"prep3":-2.6,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.7,"c5":-2.6,"test":-2.6,"r2":-2.6,"r3":-2.7,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.4,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"am_michael":{"prep3":2.1,"prep1":2.9,"prep2":-0.1,"prep4":1.2,"prep5":1.2},"andrewp":{"c8":-2.7,"prep3":-2.6,"c9":-3.0,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.5,"test":-2.6,"r2":-2.6,"r3":-2.7,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.5,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.7},"algenibw":{"prep3":1.3,"prep1":-0.3,"prep2":0.1},"gracesoft":{"c8":-3.3,"prep3":0.1,"c9":-2.9,"c1":-0.9,"prep1":-2.7,"endReturn":-0.2,"c5":-2.4,"test":-2.0,"r2":-1.3,"r3":-2.5,"endRest":-1.7,"prep2":-2.8,"onset2":-0.9,"c4":-1.9,"c7":-1.2,"c6":0.3,"c3":-2.1,"r1":-1.3,"r4":-0.5,"prep4":-1.3,"nudge":-3.4,"prep6":-0.8,"prep5":-1.2,"onset1":-1.0,"c2":-1.4},"ballad":{"c8":-2.5,"prep3":-0.4,"c9":-3.5,"c1":-3.8,"prep1":-1.8,"endReturn":-2.4,"c5":-1.8,"test":-2.1,"r2":-1.1,"r3":-2.1,"endRest":-3.4,"prep2":-2.3,"onset2":-1.9,"c4":-3.0,"c7":-2.0,"c6":-2.7,"c3":-0.3,"r1":-2.3,"r4":-2.6,"prep4":1.6,"nudge":-1.0,"prep6":-2.5,"prep5":-3.1,"onset1":-1.6,"c2":0.1},"sagep":{"c8":-2.9,"prep3":-2.3,"c9":-3.0,"c1":-2.7,"prep1":-2.7,"endReturn":-2.7,"c5":-2.7,"test":-2.6,"r2":-2.5,"r3":-2.7,"endRest":-2.7,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.8,"c3":-2.6,"r1":-2.7,"r4":-2.6,"prep4":-2.6,"nudge":-2.8,"prep6":-2.6,"prep5":-2.5,"onset1":-2.7,"c2":-2.6},"avabright":{"c8":-4.0,"prep3":-3.0,"c9":-3.4,"c1":-3.3,"bHold":-0.7,"prep1":-2.8,"endReturn":2.3,"c5":-2.6,"test":-3.1,"r2":-1.6,"r3":-0.1,"breathOutro":-2.1,"bOut":-1.6,"breathIntro":-3.0,"bIn":-1.5,"endRest":2.6,"onset2":-2.6,"c4":-2.9,"c7":-2.7,"c6":-3.9,"c3":-3.0,"r1":-1.9,"r4":1.5,"prep4":-2.7,"nudge":-4.1,"prep6":-2.6,"prep5":-2.9,"onset1":-2.8,"c2":-3.5},"sagebright":{"c8":-2.2,"prep3":-3.4,"c9":-2.3,"c1":-3.1,"prep1":-3.1,"endReturn":2.7,"c5":-2.3,"r2":-0.3,"r3":0.5,"onset2":-2.7,"c4":-3.0,"c7":-3.1,"c6":-3.5,"c3":-2.9,"r1":-1.7,"r4":1.4,"prep4":-2.5,"nudge":-2.8,"prep6":-2.5,"prep5":-2.7,"onset1":-3.2,"c2":-2.3},"grace":{"c8":-6,"prep3":-3.6,"c9":-4.8,"c1":-4.7,"prep1":-4.9,"endReturn":-3.3,"c5":-4.7,"test":-5.6,"r2":-4.0,"r3":-5.0,"endRest":-3.8,"prep2":-4.9,"onset2":-3.3,"c4":-3.9,"c7":-3.9,"c6":-3.6,"c3":-5.5,"r1":-4.1,"r4":-3.4,"prep4":-3.2,"nudge":-5.7,"prep6":-3.1,"prep5":-4.3,"onset1":-3.9,"c2":-3.3},"sage":{"c8":-4.2,"prep3":-1.0,"c9":-2.0,"c1":-2.9,"prep1":-0.4,"endReturn":2.6,"c5":-3.0,"test":-2.6,"r2":-3.6,"r3":0.7,"endRest":-2.3,"prep2":0.7,"onset2":-2.0,"c4":-0.5,"c7":0.2,"c6":-1.4,"c3":-1.7,"r1":-0.9,"r4":-1.7,"prep4":-1.1,"nudge":-2.5,"prep6":-0.3,"prep5":0.3,"onset1":-2.0,"c2":-0.6},"sulafatn":{"c8":-2.3,"prep3":-2.2,"c9":-2.2,"c1":-2.4,"bHold":-2.8,"prep1":-2.3,"endReturn":2.6,"c5":-2.4,"test":-2.9,"r2":0.0,"r3":0.6,"breathOutro":-2.7,"bOut":-2.8,"breathIntro":-2.6,"bIn":-2.8,"endRest":2.9,"onset2":-2.4,"c4":-2.5,"c7":-3.0,"c6":-2.8,"c3":-3.0,"r1":-1.8,"r4":1.6,"prep4":-1.8,"nudge":-3.3,"prep6":-1.9,"prep5":-2.0,"onset1":-2.0,"c2":-2.5},"sadaltagerp":{"c8":-2.6,"prep3":-2.5,"c9":-2.6,"c1":-2.5,"prep1":-2.4,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.5,"r3":-2.6,"endRest":-2.5,"prep2":-2.5,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.5,"r4":-2.6,"prep4":-2.5,"nudge":-3.2,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"emma":{"c8":-6,"prep3":-5.2,"c9":-5.7,"c1":-5.2,"prep1":-4.7,"endReturn":-4.6,"c5":-5.7,"test":-4.6,"r2":-5.6,"r3":-5.4,"endRest":-5.0,"prep2":-5.5,"onset2":-4.5,"c4":-5.9,"c7":-4.4,"c6":-6,"c3":-4.4,"r1":-6,"r4":-5.0,"prep4":-4.8,"nudge":-5.2,"prep6":-4.4,"prep5":-4.4,"onset1":-5.5,"c2":-4.8},"sagecalm":{"c8":-3.6,"prep3":-2.1,"c9":-1.4,"c1":-0.4,"prep1":-0.5,"endReturn":-1.4,"c5":0.1,"test":-2.7,"r2":-0.5,"r3":-0.6,"endRest":-0.8,"prep2":0.0,"onset2":-1.1,"c4":-2.4,"c7":-2.9,"c6":-1.3,"c3":-1.5,"r1":-3.0,"r4":-1.3,"prep4":0.5,"nudge":-0.1,"prep6":1.0,"prep5":1.5,"onset1":-3.1,"c2":-1.1},"ryanp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.8,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.8,"r3":-2.5,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.8},"emmap":{"c8":-2.5,"prep3":-2.7,"c9":-2.5,"c1":-2.8,"prep1":-2.7,"endReturn":-2.6,"c5":-2.5,"test":-3.0,"r2":-2.4,"r3":-2.6,"endRest":-2.6,"prep2":-2.4,"onset2":-2.5,"c4":-2.8,"c7":-2.6,"c6":-2.8,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.7,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"sonia":{"c8":-6,"prep3":-5.2,"c9":-5.0,"c1":-5.2,"prep1":-4.7,"endReturn":-4.8,"c5":-4.8,"test":-4.3,"r2":-5.1,"r3":-5.2,"endRest":-4.9,"prep2":-5.5,"onset2":-4.6,"c4":-5.3,"c7":-4.5,"c6":-6,"c3":-4.4,"r1":-5.9,"r4":-4.8,"prep4":-4.5,"nudge":-5.0,"prep6":-4.0,"prep5":-4.7,"onset1":-5.6,"c2":-4.9},"sagew":{"c8":-2.0,"prep3":-0.7,"c9":-1.5,"c1":-1.0,"prep1":-0.9,"endReturn":-1.2,"c5":-1.1,"test":-2.6,"r2":-1.3,"r3":-1.3,"endRest":-1.9,"prep2":0.3,"onset2":-1.4,"c4":0.1,"c7":-1.7,"c6":-3.7,"c3":-0.8,"r1":-2.2,"r4":-2.2,"prep4":-1.1,"nudge":-1.0,"prep6":1.8,"prep5":-2.1,"onset1":-1.1,"c2":-2.6},"gacruxn":{"c8":-3.0,"prep3":-2.6,"c9":-2.4,"c1":-3.0,"bHold":-2.8,"prep1":-2.4,"endReturn":3.3,"c5":-2.9,"test":-2.7,"r2":0.1,"r3":-0.7,"breathOutro":-2.9,"bOut":-0.7,"breathIntro":-1.8,"bIn":-2.8,"endRest":3.4,"onset2":-2.6,"c4":-2.5,"c7":-2.7,"c6":-3.2,"c3":-3.3,"r1":-0.7,"r4":1.4,"prep4":-2.0,"nudge":-3.4,"prep6":-2.4,"prep5":-3.3,"onset1":-2.2,"c2":-2.2},"avasoftp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.5,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.5,"r1":-2.7,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"gacruxp":{"c8":-2.5,"prep3":-2.6,"c9":-2.6,"c1":-2.5,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.8,"r2":-2.5,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"balladc":{"c8":-3.0,"prep3":1.0,"c9":-3.8,"c1":-3.5,"prep1":-1.4,"endReturn":-2.1,"c5":-1.9,"test":-4.4,"r2":2.0,"r3":1.3,"endRest":-3.2,"prep2":0.2,"onset2":-1.0,"c4":-1.0,"c7":-1.7,"c6":-0.1,"c3":-3.0,"r1":-3.2,"r4":0.8,"prep4":0.5,"nudge":-2.5,"prep6":-2.7,"prep5":-0.8,"onset1":-3.2,"c2":-3.8},"algenib":{"c8":-3.5,"prep3":3.0,"c9":-3.3,"c1":0.1,"prep1":0.0,"endReturn":0.8,"c5":-1.3,"test":0.3,"r2":-0.2,"r3":-0.6,"endRest":1.6,"prep2":1.1,"onset2":1.5,"c4":3.9,"c7":-0.1,"c6":-0.9,"c3":1.0,"r1":2.8,"r4":-0.3,"prep4":-1.8,"nudge":-2.6,"prep6":-1.1,"prep5":-1.8,"onset1":-2.1,"c2":-1.7},"sadaltager":{"c8":-1.3,"prep3":1.9,"c9":-3.4,"c1":-1.4,"prep1":0.8,"endReturn":0.6,"c5":0.5,"test":-1.3,"r2":-0.6,"r3":-2.2,"endRest":0.3,"prep2":0.6,"onset2":-0.3,"c4":1.4,"c7":-1.1,"c6":-2.4,"c3":-1.2,"r1":-1.0,"r4":-0.5,"prep4":2.5,"nudge":-1.7,"prep6":-2.1,"prep5":-0.8,"onset1":-0.9,"c2":-1.5},"sagec":{"c8":-1.5,"prep3":-2.3,"c9":-0.1,"c1":1.2,"prep1":-1.9,"endReturn":1.6,"c5":1.8,"test":-2.4,"r2":0.3,"r3":0.3,"endRest":-1.3,"prep2":-1.6,"onset2":-1.6,"c4":-0.7,"c7":-1.1,"c6":-3.1,"c3":-0.6,"r1":-1.6,"r4":-1.7,"prep4":-0.1,"nudge":-3.3,"prep6":3.1,"prep5":-2.0,"onset1":-3.0,"c2":2.7}};   // per-line loudness match (every line lands at the same level)
   const lineGain = name => Math.pow(10, ((LG[voiceId] || {})[name] || 0) / 20);
-  let ctx, master, music, duck, voice, vLow, vHigh, mLP, mHS, analyser, loopSrc = null; const buf = {}; const loads = {}; let lvBuf = null; let speaking = 0; let paused = false; const scheduled = [];
+  let ctx, master, music, duck, voice, vLow, vHigh, vSoft, vAir, active = new Set(), mLP, mHS, analyser, loopSrc = null; const buf = {}; const loads = {}; let lvBuf = null; let speaking = 0; let paused = false; const scheduled = [];
   function ensure(){
     if(ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext; try{ ctx = new AC({ latencyHint: "playback" }); }catch(e){ ctx = new AC(); }   // bigger buffer: no crackles on phones
@@ -314,21 +327,25 @@ const audio = (() => {
     voice = ctx.createGain();
     vLow = ctx.createBiquadFilter(); vLow.type = "lowshelf"; vLow.frequency.value = 220;
     vHigh = ctx.createBiquadFilter(); vHigh.type = "highshelf"; vHigh.frequency.value = 3800;
-    voice.connect(vLow); vLow.connect(vHigh); vHigh.connect(master);
+    vSoft = ctx.createBiquadFilter(); vSoft.type = "peaking"; vSoft.frequency.value = 6500; vSoft.Q.value = 0.9;   // where "s" and "t" sounds bite
+    vAir = ctx.createBiquadFilter(); vAir.type = "highshelf"; vAir.frequency.value = 9500;                         // fizz and hiss above that
+    voice.connect(vLow); vLow.connect(vHigh); vHigh.connect(vSoft); vSoft.connect(vAir); vAir.connect(master);
     analyser = ctx.createAnalyser(); analyser.fftSize = 1024; analyser.smoothingTimeConstant = 0.6; voice.connect(analyser);
     lvBuf = new Float32Array(analyser.fftSize);
     applyVol();
   }
-  function applyVol(){
+  function applyVol(tc = 0.05){
     if(!ctx) return;
     const t = ctx.currentTime;
-    voice.gain.setTargetAtTime(dbGain(+$("#voiceVol").value, 85), t, 0.05);      // 85 = original level, 100 = about 2x louder
+    const sa = (+$("#softAmt").value)/100;             // 0 off ... 1 very soft
+    vSoft.gain.setTargetAtTime(-sa * 9, t, tc); vAir.gain.setTargetAtTime(-sa * 10, t, tc);
+    voice.gain.setTargetAtTime(dbGain(+$("#voiceVol").value, 85), t, tc);      // 85 = original level, 100 = about 2x louder
     const vt = (+$("#voiceTone").value)/100;           // -1 warmer ... +1 clearer
-    vLow.gain.setTargetAtTime(vt < 0 ? -vt*7 : -vt*4, t, 0.05);
-    vHigh.gain.setTargetAtTime(vt < 0 ? vt*9 : vt*7, t, 0.05);
+    vLow.gain.setTargetAtTime(vt < 0 ? -vt*7 : -vt*4, t, tc);
+    vHigh.gain.setTargetAtTime(vt < 0 ? vt*9 : vt*7, t, tc);
     const mt = (+$("#musicTone").value)/100;           // 0 softer ... 0.5 neutral ... 1 airier
-    if(mt < 0.5){ mLP.frequency.setTargetAtTime(500 * Math.pow(20000/500, mt*2), t, 0.05); mHS.gain.setTargetAtTime(0, t, 0.05); }
-    else { mLP.frequency.setTargetAtTime(20000, t, 0.05); mHS.gain.setTargetAtTime((mt - 0.5) * 2 * 10, t, 0.05); }
+    if(mt < 0.5){ mLP.frequency.setTargetAtTime(500 * Math.pow(20000/500, mt*2), t, tc); mHS.gain.setTargetAtTime(0, t, tc); }
+    else { mLP.frequency.setTargetAtTime(20000, t, tc); mHS.gain.setTargetAtTime((mt - 0.5) * 2 * 10, t, tc); }
   }
   // slider 0..100 -> loudness in decibels, so every part of the slider is audible (0 = silent)
   function dbGain(v, unity){ return v <= 0 ? 0 : Math.pow(10, ((v - unity) * 0.42) / 20); }
@@ -356,7 +373,7 @@ const audio = (() => {
     async decodeVoice(v){ await this.preload(v); for(const p of pathsFor(v)){ if(!buf[p]) buf[p] = await decode(raw[p].slice(0)); } },
     get ctx(){ return ctx; },
     startMusic(fadeSec=6){
-      if(loopSrc) return;
+      if(loopSrc){ const t = ctx.currentTime; music.gain.cancelScheduledValues(t); music.gain.setValueAtTime(music.gain.value, t); music.gain.linearRampToValueAtTime(musicTarget(), t + fadeSec); return; }
       loopSrc = ctx.createBufferSource(); loopSrc.buffer = buf["audio/ambient2.mp3"]; loopSrc.loop = true;
       const d = loopSrc.buffer.duration; if(d > 300.05){ loopSrc.loopStart = 0; loopSrc.loopEnd = 300; }
       loopSrc.connect(music); loopSrc.start();
@@ -364,7 +381,8 @@ const audio = (() => {
       music.gain.setValueAtTime(music.gain.value, ctx.currentTime);
       music.gain.linearRampToValueAtTime(musicTarget(), ctx.currentTime + fadeSec);
     },
-    setVolume(){ if(!ctx) return; applyVol(); if(speaking) duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 0.3); if(loopSrc) music.gain.setTargetAtTime(musicTarget(), ctx.currentTime, 0.4); },
+    setVolume(slow){ if(!ctx) return; applyVol(slow ? 0.5 : 0.05); if(speaking) duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 0.3); if(loopSrc) music.gain.setTargetAtTime(musicTarget(), ctx.currentTime, slow ? 0.8 : 0.4); },
+    stopVoice(){ if(!ctx) return; const t = ctx.currentTime; active.forEach(s => { try{ s._fg.gain.cancelScheduledValues(t); s._fg.gain.setTargetAtTime(0, t, 0.15); s.stop(t + 0.8); }catch(e){} }); active.clear(); },
     fadeMusic(sec){ if(!ctx) return; const t = ctx.currentTime; music.gain.cancelScheduledValues(t); music.gain.setValueAtTime(music.gain.value, t); music.gain.linearRampToValueAtTime(0, t + sec); },
     stopMusic(){ if(loopSrc){ try{ loopSrc.stop(ctx.currentTime + 0.5); }catch(e){} music.gain.setTargetAtTime(0, ctx.currentTime, 0.1); loopSrc = null; } },
     bell(level=1){ const b = buf["audio/bell2.mp3"]; if(!b) return; const s = ctx.createBufferSource(); s.buffer = b; const g = ctx.createGain();
@@ -384,9 +402,9 @@ const audio = (() => {
         const b = buf[`audio/${voiceId}/${name}.mp3?s4`]; if(!b){ res(); return; }
         const s = ctx.createBufferSource(); s.buffer = b; const fg = ctx.createGain(); const t0 = ctx.currentTime + 0.05;
         fg.gain.setValueAtTime(0, t0); fg.gain.linearRampToValueAtTime(lineGain(name), t0 + 0.5);      // half-second fade-in
-        s.connect(fg); fg.connect(voice);
+        s.connect(fg); fg.connect(voice); s._fg = fg; active.add(s);
         speaking++; duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 1.5);
-        s.onended = () => { speaking = Math.max(0, speaking-1); if(!speaking) duck.gain.setTargetAtTime(1, ctx.currentTime, 3.5); res(); };
+        s.onended = () => { active.delete(s); speaking = Math.max(0, speaking-1); if(!speaking) duck.gain.setTargetAtTime(1, ctx.currentTime, 3.5); res(); };
         s.start(t0);
       });
     },
@@ -434,20 +452,60 @@ async function requestWake(){ try{ if("wakeLock" in navigator) state.wake = awai
 document.addEventListener("visibilitychange", () => { if(document.visibilityState==="visible" && !["idle","done"].includes(state.phase)) requestWake(); });
 function show(id){ document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id===id)); }
 
+/* ---------- Sound panel: moods + plain-language controls ---------- */
+const MOODS = [
+  {k:"soft",   name:"Soft & close",   d:"The gentle default",      v:{voiceVol:72, voiceTone:-20, softAmt:45, musicVol:55, musicTone:40, duckAmt:30}},
+  {k:"cozy",   name:"Warm & cozy",    d:"Rounder, darker, wrapped", v:{voiceVol:70, voiceTone:-55, softAmt:60, musicVol:58, musicTone:24, duckAmt:25}},
+  {k:"clear",  name:"Clear & calm",   d:"Easiest to follow",        v:{voiceVol:76, voiceTone:15,  softAmt:35, musicVol:46, musicTone:50, duckAmt:40}},
+  {k:"sleepy", name:"Quiet & sleepy", d:"Low and hushed",           v:{voiceVol:60, voiceTone:-40, softAmt:65, musicVol:44, musicTone:18, duckAmt:20}},
+  {k:"voice",  name:"Just her voice", d:"No background sound",      v:{voiceVol:72, voiceTone:-20, softAmt:45, musicVol:0,  musicTone:40, duckAmt:0}},
+];
+const CTRL = [
+  {head:"Her voice"},
+  {id:"voiceVol",  name:"How loud she is",          lo:"Quieter", hi:"Louder", min:0, max:100},
+  {id:"voiceTone", name:"How her voice feels",      lo:"Warmer, rounder", hi:"Clearer, crisper", min:-100, max:100},
+  {id:"softAmt",   name:"Soften sharp sounds", hint:"Takes the edge off hissy “s”, “t” and “sh” sounds", lo:"Off", hi:"Very soft", min:0, max:100},
+  {head:"Background sound"},
+  {id:"musicVol",  name:"How loud it is",           lo:"Off", hi:"Fuller", min:0, max:100},
+  {id:"musicTone", name:"How it feels",             lo:"Darker, muffled", hi:"Lighter, airy", min:0, max:100},
+  {id:"duckAmt",   name:"Gets quieter while she talks", hint:"So her words are easy to hear", lo:"Not at all", hi:"A lot", min:0, max:100},
+];
+const panelHTML = () => `<div class="moods">${MOODS.map(m => `<button type="button" class="mood" data-mood="${m.k}"><b>${m.name}</b><span>${m.d}</span></button>`).join("")}</div>
+  <div class="mixNote"></div>
+  ${CTRL.map(c => c.head ? `<div class="ctlHead">${c.head}</div>` : `<div class="ctl"><div class="ctlName">${c.name}${c.hint ? `<small>${c.hint}</small>` : ""}</div>
+    <input type="range" data-mirror="${c.id}" min="${c.min}" max="${c.max}" aria-label="${c.name}"><div class="ends"><span>${c.lo}</span><span>${c.hi}</span></div></div>`).join("")}
+  <button type="button" class="resetSnd">Back to the gentle default</button>`;
+document.querySelectorAll(".sndPanel").forEach(p => p.innerHTML = panelHTML());
+function currentMood(){ return MOODS.find(m => SND_IDS.every(id => Math.abs(+$("#"+id).value - m.v[id]) < 1)); }
+function syncPanels(){
+  document.querySelectorAll("[data-mirror]").forEach(el => { el.value = $("#"+el.dataset.mirror).value; });
+  const m = currentMood();
+  document.querySelectorAll(".mood").forEach(b => b.classList.toggle("sel", !!m && b.dataset.mood === m.k));
+  document.querySelectorAll(".mixNote").forEach(n => n.textContent = m ? "" : "Your own mix · saved");
+}
+function setSound(vals, slow){ Object.entries(vals).forEach(([id, v]) => { $("#"+id).value = v; store.set("kap_"+id, String(v)); }); syncPanels(); audio.setVolume(slow); }
+document.addEventListener("input", e => { const el = e.target.closest("[data-mirror]"); if(!el) return; setSound({[el.dataset.mirror]: el.value}, false); });
+document.addEventListener("click", e => {
+  const m = e.target.closest(".mood"); if(m){ e.stopPropagation(); setSound(MOODS.find(x => x.k === m.dataset.mood).v, true); return; }
+  if(e.target.closest(".resetSnd")){ e.stopPropagation(); setSound(MOODS[0].v, true); }
+}, true);
+syncPanels();
+
+// Listen while you adjust: music + her voice, on repeat, until tapped again
+let listening = false;
 $("#testBtn").addEventListener("click", async () => {
+  const b = $("#testBtn");
+  if(listening){ listening = false; b.classList.remove("on"); b.innerHTML = "▶&nbsp; Listen while you adjust"; audio.stopVoice(); audio.fadeMusic(1.5); setTimeout(() => { if(!listening) audio.stopMusic(); }, 1700); return; }
   try{ preview.pause(); }catch(e){}
-  const b = $("#testBtn"); b.disabled = true;
-  await audio.unlockAndDecode(); audio.startMusic(2); audio.bell();
-  await wait(1.5); await audio.play("test"); await wait(2);
-  audio.fadeMusic(2); await wait(2.2); audio.stopMusic(); b.disabled = false;
+  listening = true; b.classList.add("on"); b.innerHTML = "■&nbsp; Stop listening";
+  await audio.unlockAndDecode(); audio.startMusic(2);
+  await wait(1.5);
+  while(listening){ await audio.play("test"); if(listening) await wait(2.5); }
 });
-["musicVol","voiceVol","voiceTone","musicTone","duckAmt"].forEach(id => $("#"+id).addEventListener("input", () => audio.setVolume()));
-document.querySelectorAll("[data-mirror]").forEach(el => el.addEventListener("input", e => {
-  const id = el.dataset.mirror; $("#"+id).value = e.target.value; store.set("kap_"+id, e.target.value); audio.setVolume();
-}));
+function stopListening(){ if(listening) $("#testBtn").click(); }
 
 $("#startBtn").addEventListener("click", async () => {
-  try{ preview.pause(); }catch(e){}
+  try{ preview.pause(); }catch(e){} if(listening){ listening = false; $("#testBtn").classList.remove("on"); $("#testBtn").innerHTML = "▶&nbsp; Listen while you adjust"; audio.stopVoice(); audio.stopMusic(); }
   const b = $("#startBtn"); b.disabled = true; b.textContent = "Starting…";
   try{ await audio.unlockAndDecode(); }catch(e){ b.textContent = "Audio failed to start. Reload and try again"; return; }
   requestWake();
@@ -633,7 +691,7 @@ sess.addEventListener("contextmenu", e => e.preventDefault());
 function doPause(){
   if(state.paused) return;
   state.paused = true; audio.pause();
-  document.querySelectorAll("[data-mirror]").forEach(el => el.value = $("#"+el.dataset.mirror).value);
+  syncPanels();
   const sel = $("#pVoiceSel"), favs = FAVORITES.map(id => VOICES.find(v => v.id === id)).filter(Boolean), others = VOICES.filter(v => !FAVORITES.includes(v.id));
   sel.innerHTML = `<optgroup label="Favorites">${favs.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</optgroup><optgroup label="Other voices">${others.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</optgroup>`;
   sel.value = voiceId; $("#pVoiceMsg").textContent = "";
@@ -647,8 +705,7 @@ $("#pVoiceSel").addEventListener("change", async e => {
   btn.disabled = false;
 });
 $("#sndBtn").addEventListener("click", e => { e.stopPropagation();
-  document.querySelectorAll("#sndSheet [data-mirror]").forEach(el => el.value = $("#"+el.dataset.mirror).value);
-  $("#sndSheet").classList.add("on"); });
+  syncPanels(); $("#sndSheet").classList.add("on"); });
 $("#sndClose").addEventListener("click", e => { e.stopPropagation(); $("#sndSheet").classList.remove("on"); });
 $("#resumeBtn").addEventListener("click", () => {
   $("#pausedLayer").classList.remove("on");
