@@ -2,842 +2,839 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d1519">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Session Guide">
-<title>KAP Session Guide</title>
+<title>Gentle Session Guide</title>
 <style>
   :root{
-    --bg:#0c0b13; --ink:#e6e1d8; --dim:#9a94a6; --faint:#3a3648; --accent:#e0b48a; --line:#1f1c2a;
+    --bg:#1d1519; --bg2:#271b20; --ink:#f4ebe1; --dim:#c3b2a4; --faint:rgba(244,235,225,.16); --line:rgba(244,235,225,.09);
+    --accent:#f0b98f; --accentSoft:rgba(240,185,143,.12); --sage:#b3cba9; --card:rgba(255,240,225,.035);
+    --round: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
-    font:17px/1.5 ui-serif, Georgia, "Iowan Old Style", serif;}
-  body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
-  .screen{display:none;min-height:100%;padding:28px 22px 40px;max-width:520px;margin:0 auto}
-  .screen.on{display:block;animation:softIn 2.2s ease both}
-  @keyframes softIn{from{opacity:0}to{opacity:1}}
-  body{transition:opacity .9s ease}
-  body.leaving{opacity:0}
-  h1{font-weight:400;font-size:28px;letter-spacing:.01em;margin:18px 0 6px}
-  h2{font-weight:400;font-size:19px;margin:28px 0 10px;color:var(--accent)}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:17px/1.55 var(--round)}
+  body{background:radial-gradient(120% 70% at 50% -10%, #3a2529 0%, var(--bg) 60%) fixed;overflow-x:hidden}
+  button{font:inherit;color:inherit;cursor:pointer}
+  a{color:var(--accent)}
+  .wrap{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 22px) 22px calc(env(safe-area-inset-bottom) + 40px)}
+  h1{font-weight:600;font-size:28px;line-height:1.25;margin:10px 0 8px;letter-spacing:-.005em}
+  h2{font-weight:600;font-size:18px;margin:30px 0 8px;color:var(--accent)}
   p{margin:0 0 12px}
-  .muted{color:var(--dim);font-size:15px}
-  .sans{font-family:ui-sans-serif,-apple-system,system-ui,sans-serif}
-  label.check{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
-  label.check input{appearance:none;flex:none;width:24px;height:24px;border:1.5px solid var(--faint);border-radius:50%;margin-top:1px;display:grid;place-items:center}
-  label.check input:checked{border-color:var(--accent);background:var(--accent)}
-  label.check input:checked::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--bg)}
-  .row{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
-  .chip{font:15px ui-sans-serif,-apple-system,system-ui,sans-serif;padding:10px 16px;border-radius:999px;border:1px solid var(--faint);background:none;color:var(--ink)}
-  .chip.sel{border-color:var(--accent);color:var(--accent)}
-  textarea{width:100%;min-height:90px;background:#0e0f13;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:inherit;padding:12px;resize:vertical}
-  select{width:100%;background:#0e0f13;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:15px ui-sans-serif,system-ui,sans-serif;padding:11px}
-  input[type=range]{width:100%;accent-color:var(--accent)}
-  .btn{display:block;width:100%;margin-top:26px;padding:18px;border-radius:14px;border:none;background:var(--accent);color:#141008;
-    font:600 17px ui-sans-serif,-apple-system,system-ui,sans-serif}
-  .btn.ghost{background:none;border:1px solid var(--faint);color:var(--ink);font-weight:500}
-  .btn:disabled{opacity:.35}
-  .note{border-left:2px solid var(--accent);padding:4px 0 4px 14px;margin:18px 0;color:var(--dim);font-size:15px}
+  .dim{color:var(--dim)} .small{font-size:14px}
+  .screen{display:none;opacity:0;transition:opacity 1.1s ease}
+  .screen.on{display:block}
+  .screen.show{opacity:1}
 
-  .voice{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 14px;margin:0 0 8px;border:1px solid var(--line);border-radius:12px;background:#0c0d11;color:var(--ink);font:inherit}
-  .voice.sel{border-color:var(--accent)}
-  .voice .play{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--faint);display:grid;place-items:center;color:var(--accent);font:13px ui-sans-serif,system-ui}
-  .voice.sel .play{border-color:var(--accent)}
-  .voice b{font-weight:500;display:block}
-  .others{margin-top:4px}
-  .others summary{list-style:none;cursor:pointer;padding:12px 14px;border:1px dashed var(--faint);border-radius:12px;color:var(--dim);font:14px ui-sans-serif,system-ui,sans-serif;display:flex;justify-content:space-between}
-  .others summary::-webkit-details-marker{display:none}
-  .others summary::after{content:"▾";transition:transform .6s ease}
-  .others[open] summary::after{transform:rotate(180deg)}
-  .others summary span{opacity:.6;margin-left:auto;margin-right:10px}
-  .othersInner{margin-top:8px;animation:softIn 1.2s ease both}
-  .voice span.d{color:var(--dim);font-size:14px}
-  /* Session (dark) view */
-  #session{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 42%, #1b1530 0%, #0d0a18 50%, #050409 100%);display:none;max-width:none;padding:0;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-  #session.on{display:block;animation:softIn 2.5s ease both}
-  #orb{position:absolute;left:50%;top:44%;width:190px;height:190px;margin:-95px 0 0 -95px;border-radius:50%;will-change:transform,opacity;
-    background:radial-gradient(circle, rgba(255,222,186,.60) 0%, rgba(236,176,140,.30) 26%, rgba(170,140,220,.13) 50%, rgba(120,100,190,0) 70%);
-    filter:blur(2px);opacity:.6}
-  #bRing{position:absolute;left:50%;top:44%;width:340px;height:340px;margin:-170px 0 0 -170px;opacity:0;pointer-events:none;overflow:visible}
-  #breathLbl{position:absolute;left:0;right:0;top:calc(44% + 168px);text-align:center;opacity:0;pointer-events:none}
-  #bWord{display:block;font-size:26px;letter-spacing:.04em;color:#ecd9c2}
-  #bCount{display:block;margin-top:6px;font:15px ui-sans-serif,system-ui,sans-serif;letter-spacing:.3em;color:#8f84a8}
-  #caption{position:absolute;left:0;right:0;bottom:22%;padding:0 34px;text-align:center;color:#6f6c66;font-size:18px;min-height:3em;transition:opacity 3s ease}
-  #phaseLbl{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top) + 22px);text-align:center;color:#33343a;font:13px ui-sans-serif,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase}
-  #hold{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 22px);text-align:center;color:#2a2b30;font:12px ui-sans-serif,system-ui,sans-serif}
-  #ring{position:absolute;left:50%;top:44%;width:150px;height:150px;margin:-75px 0 0 -75px;opacity:0;transition:opacity .8s ease;pointer-events:none}
-  #tapGate{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
-  #tapGate.on{display:flex;animation:softIn 3s ease both}
-  #tapGate .big{font-size:24px;color:#9a968e;margin-bottom:10px}
-  #tapGate .small{color:#4b4c52;font:14px ui-sans-serif,system-ui,sans-serif}
-  #pausedLayer{position:absolute;inset:0;background:rgba(10,8,20,.93);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px}
-  #pausedLayer.on{display:flex;animation:softIn 1.4s ease both}
-  #pausedLayer .btn{max-width:320px;margin:0}
-  #sndBtn{position:absolute;right:calc(env(safe-area-inset-right) + 16px);top:calc(env(safe-area-inset-top) + 14px);background:none;border:1px solid #2a2638;color:#6d6680;border-radius:999px;padding:7px 14px;font:13px ui-sans-serif,system-ui,sans-serif;z-index:5}
-  #sndSheet{position:absolute;left:0;right:0;bottom:0;transform:translateY(105%);transition:transform 1s cubic-bezier(.22,.8,.3,1);z-index:6;padding:0 12px calc(env(safe-area-inset-bottom) + 12px)}
-  #sndSheet.on{transform:translateY(0)}
-  .sheetIn{max-width:460px;margin:0 auto;background:rgba(20,17,31,.96);border:1px solid #2a2638;border-radius:20px;padding:16px 18px 10px}
-  .sheetHead{display:flex;justify-content:space-between;align-items:center;font:15px ui-sans-serif,system-ui,sans-serif;color:#e6e1d8}
-  .sheetHead button{background:#2a2333;color:#e0b48a;border:0;border-radius:999px;padding:8px 16px;font:14px ui-sans-serif,system-ui,sans-serif}
-  .sheetNote{color:#6d6680;font:12px ui-sans-serif,system-ui,sans-serif;margin:10px 0 2px;text-align:center}
-  .pvol{width:100%;max-width:380px;text-align:left;margin:4px 0 10px;max-height:52vh;overflow:auto}
-  .snd label{display:flex;justify-content:space-between;align-items:baseline;color:var(--dim);font:14px ui-sans-serif,system-ui,sans-serif;margin:16px 0 4px}
-  .pvsel{width:100%;background:#15131f;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:15px ui-sans-serif,system-ui,sans-serif;padding:10px}
-  .pvmsg{display:block;min-height:1.2em;margin-top:6px;color:var(--dim);font:13px ui-sans-serif,system-ui,sans-serif}
-  .snd label span{font-size:12px;opacity:.7}
-  .snd input{width:100%;height:30px;accent-color:var(--accent)}
-  .pvol label{display:block;color:#8a8780;font:14px ui-sans-serif,system-ui,sans-serif;margin:14px 0 4px}
-  .pvol input{width:100%;height:32px;accent-color:#c9a46a}
-  /* layman sound panel */
-  .moods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 2px}
-  .mood{text-align:left;padding:12px 14px;border-radius:14px;border:1px solid var(--faint);background:none;color:var(--ink);font:15px ui-sans-serif,-apple-system,system-ui,sans-serif;transition:border-color .7s ease,background .7s ease}
-  .mood b{display:block;font-weight:500;transition:color .7s ease}
-  .mood span{display:block;font-size:12px;color:var(--dim);margin-top:3px}
-  .mood.sel{border-color:var(--accent);background:rgba(224,180,138,.08)}
-  .mood.sel b{color:var(--accent)}
-  .mood:last-child:nth-child(odd){grid-column:1/-1}
-  .mixNote{font:12px ui-sans-serif,system-ui,sans-serif;color:var(--dim);min-height:1.4em;margin:8px 2px 0;transition:opacity .7s ease}
-  .ctlHead{font:13px ui-sans-serif,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:22px 0 0;opacity:.8}
-  .ctl{margin:16px 0 0}
-  .ctlName{font:15px ui-sans-serif,-apple-system,system-ui,sans-serif;color:var(--ink)}
-  .ctlName small{display:block;font-size:12px;color:var(--dim);margin-top:2px}
-  .ends{display:flex;justify-content:space-between;font:12px ui-sans-serif,system-ui,sans-serif;color:var(--dim);margin-top:0}
-  .sndPanel input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:36px;background:transparent;margin:4px 0 0;padding:0}
-  .sndPanel input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:rgba(255,255,255,.13)}
-  .sndPanel input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--accent);margin-top:-11px;box-shadow:0 0 0 7px rgba(224,180,138,.13);border:0}
-  .sndPanel input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:rgba(255,255,255,.13)}
-  .sndPanel input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--accent);border:0;box-shadow:0 0 0 7px rgba(224,180,138,.13)}
-  .resetSnd{display:block;margin:20px auto 4px;background:none;border:0;color:var(--dim);text-decoration:underline;text-underline-offset:3px;font:13px ui-sans-serif,system-ui,sans-serif;padding:8px}
-  #testBtn.on{border-color:var(--accent);color:var(--accent)}
-  .sheetIn{max-height:80vh;overflow:auto}
-  .modes{display:flex;gap:4px;padding:4px;margin:4px 0 14px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.02)}
-  .modes a{flex:1;text-align:center;padding:9px 10px;border-radius:999px;color:var(--dim);text-decoration:none;font:500 14px ui-sans-serif,system-ui,sans-serif;transition:background .8s ease,color .8s ease}
-  .modes a.on{background:#2a2333;color:var(--accent)}
-  #resumeCard{display:none;border:1px solid var(--accent);border-radius:14px;padding:18px;margin:18px 0 8px;background:#0e0d0a}
-  #resumeCard .btn{margin-top:14px}
-  #resumeCard .link{display:block;width:100%;margin-top:10px;background:none;border:none;color:var(--dim);font:14px ui-sans-serif,system-ui,sans-serif;padding:10px}
+  /* buttons and choices */
+  .btn{display:block;width:100%;margin-top:22px;padding:17px;border-radius:18px;border:0;background:var(--accent);color:#2a1a12;font-weight:600;font-size:17px;transition:opacity .5s, transform .2s}
+  .btn:active{transform:scale(.99)}
+  .btn.soft{background:var(--accentSoft);color:var(--ink);border:1px solid var(--faint);font-weight:500}
+  .btn.quiet{background:none;color:var(--dim);font-weight:500;padding:12px;margin-top:8px}
+  .btn:disabled{opacity:.35}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+  .chip{padding:10px 16px;border-radius:999px;border:1px solid var(--faint);background:none;font-size:15px;transition:all .6s ease}
+  .chip.sel{border-color:var(--accent);background:var(--accentSoft);color:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin:14px 0}
+  .card.warm{border-color:rgba(240,185,143,.35)}
+  textarea,input[type=text]{width:100%;background:rgba(0,0,0,.18);border:1px solid var(--faint);border-radius:14px;color:var(--ink);font:16px var(--round);padding:13px}
+  textarea{min-height:84px;resize:vertical}
+  label.check{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+  label.check input{appearance:none;-webkit-appearance:none;flex:none;width:24px;height:24px;border:1.5px solid var(--faint);border-radius:50%;margin-top:1px;display:grid;place-items:center;transition:all .4s}
+  label.check input:checked{border-color:var(--sage);background:var(--sage)}
+  label.check input:checked::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--bg)}
+  .scale{display:grid;gap:6px;margin:8px 0}
+  .scale button{padding:11px 0;border-radius:12px;border:1px solid var(--faint);background:none;font-size:15px;transition:all .4s}
+  .scale button.sel{background:var(--accent);color:#2a1a12;border-color:var(--accent)}
+  .ends{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-top:2px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:38px;background:transparent;margin:2px 0 0}
+  input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:5px;background:rgba(244,235,225,.14)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--accent);margin-top:-11.5px;box-shadow:0 0 0 7px rgba(240,185,143,.14)}
+  input[type=range]::-moz-range-track{height:5px;border-radius:5px;background:rgba(244,235,225,.14)}
+  input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:var(--accent);border:0}
+  details summary{cursor:pointer;color:var(--dim);padding:10px 0;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"+ ";color:var(--accent)}
+  details[open] summary::before{content:"– "}
+
+  /* home */
+  .hello{margin-top:16px}
+  .choice{display:block;width:100%;text-align:left;margin:14px 0;padding:22px 20px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(160deg, rgba(255,235,215,.06), rgba(255,235,215,.015));transition:border-color .6s, transform .2s}
+  .choice:active{transform:scale(.99)}
+  .choice b{display:block;font-size:20px;font-weight:600;margin-bottom:4px}
+  .choice span{color:var(--dim);font-size:15px}
+  .choice .tag{display:block;margin-top:12px;font-size:13px;color:var(--accent)}
+  .foot{margin-top:34px;text-align:center;font-size:13px;color:var(--dim)}
+  .foot a{color:var(--dim)}
+  .banner{font-size:13px;color:var(--dim);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:6px 0 4px;text-align:center}
+  .back{background:none;border:0;color:var(--dim);padding:6px 0;font-size:15px}
+
+  /* voices */
+  .voice{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:14px 16px;margin:8px 0;border-radius:18px;border:1px solid var(--line);background:var(--card);transition:all .6s ease}
+  .voice.sel{border-color:var(--accent);background:var(--accentSoft)}
+  .voice .pl{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(244,235,225,.08);font-size:12px}
+  .voice b{display:block;font-weight:600}
+  .voice small{color:var(--dim);font-size:13px}
+
+  /* sound panel */
+  .snd .row{margin:18px 0 0}
+  .snd .name{font-size:15px}
+  .snd .hint{font-size:13px;color:var(--dim)}
+  .toggle{display:flex;gap:8px;margin-top:8px}
+  .toggle button{flex:1;padding:11px 8px;border-radius:14px;border:1px solid var(--faint);background:none;font-size:14px;transition:all .6s}
+  .toggle button.sel{border-color:var(--accent);background:var(--accentSoft);color:var(--accent)}
+
+  /* full-screen session layers */
+  .stage{position:fixed;inset:0;background:radial-gradient(90% 60% at 50% 45%, #2a1c22 0%, #150f12 70%);display:none;opacity:0;transition:opacity 1.6s ease;z-index:20;touch-action:manipulation}
+  .stage.on{display:block} .stage.show{opacity:1}
+  .topbar{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top) + 12px);display:flex;justify-content:space-between;padding:0 16px;transition:opacity 2s ease;z-index:3}
+  .pill{background:rgba(255,240,225,.06);border:1px solid rgba(255,240,225,.12);color:#d9c8b8;border-radius:999px;padding:9px 16px;font-size:14px}
+  .stage.idle .topbar{opacity:.28}
+  #orb{position:absolute;left:50%;top:44%;width:210px;height:210px;margin:-105px 0 0 -105px;border-radius:50%;
+    background:radial-gradient(circle, rgba(250,205,165,.95) 0%, rgba(240,170,130,.55) 28%, rgba(220,140,120,.18) 52%, rgba(200,120,110,0) 70%);
+    filter:blur(6px);opacity:.35;will-change:transform,opacity}
+  #bRing{position:absolute;left:50%;top:44%;width:340px;height:340px;margin:-170px 0 0 -170px;pointer-events:none;opacity:0;transition:opacity 2.5s ease}
+  #bWord{position:absolute;left:0;right:0;top:calc(44% + 175px);text-align:center;color:#ecdccd;font-size:20px;opacity:0;transition:opacity 1.2s ease}
+  #phase{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top) + 64px);text-align:center;color:#a8968a;font-size:14px;letter-spacing:.12em;text-transform:uppercase;transition:opacity 2s}
+  #caption{position:absolute;left:24px;right:24px;bottom:calc(env(safe-area-inset-bottom) + 70px);text-align:center;color:#e9dccf;font-size:18px;opacity:0;transition:opacity 2s ease}
+  #gate{position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:30px;opacity:0;transition:opacity 1.6s ease;z-index:2}
+  #gate.on{display:grid} #gate.show{opacity:1}
+  #gate .big{font-size:24px;line-height:1.4;margin-bottom:12px}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .9s cubic-bezier(.22,.8,.3,1);padding:0 10px calc(env(safe-area-inset-bottom) + 10px)}
+  .sheet.on{transform:none}
+  .sheet .in{max-width:520px;margin:0 auto;max-height:84vh;overflow:auto;background:#241a1f;border:1px solid rgba(255,240,225,.12);border-radius:24px;padding:18px 20px 16px;box-shadow:0 -20px 60px rgba(0,0,0,.4)}
+  .sheet .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .sheet .head b{font-size:17px}
+
+  /* break */
+  #break{position:fixed;inset:0;z-index:50;background:rgba(21,15,18,.97);display:none;opacity:0;transition:opacity 1.2s ease;overflow:auto}
+  #break.on{display:block} #break.show{opacity:1}
+  #break .wrap{text-align:center;padding-top:calc(env(safe-area-inset-top) + 40px)}
+  #breakGlow{width:150px;height:150px;margin:20px auto 18px;border-radius:50%;background:radial-gradient(circle, rgba(179,203,169,.9), rgba(179,203,169,.25) 45%, rgba(179,203,169,0) 70%);filter:blur(4px);animation:slowbreath 10s ease-in-out infinite}
+  @keyframes slowbreath{0%,100%{transform:scale(.75);opacity:.45}50%{transform:scale(1.05);opacity:.95}}
+  #ground{display:none;text-align:left}
+
+  /* emdr */
+  #bls{position:fixed;inset:0;z-index:30;background:#140e11;display:none;opacity:0;transition:opacity 1.2s ease}
+  #bls.on{display:block} #bls.show{opacity:1}
+  #dot{position:absolute;top:46%;left:0;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:radial-gradient(circle,#ffe2c8 0%,#f0b98f 45%,rgba(240,185,143,0) 72%);will-change:transform}
+  #blsMsg{position:absolute;left:24px;right:24px;top:calc(46% + 70px);text-align:center;color:#d8c7b8;font-size:16px;transition:opacity 1.5s}
+  #blsCount{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 90px);text-align:center;color:#8f7f74;font-size:14px}
+  .blsBar{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 22px);display:flex;gap:10px;justify-content:center}
+  #ebreath{width:120px;height:120px;margin:18px auto;border-radius:50%;background:radial-gradient(circle, rgba(240,185,143,.85), rgba(240,185,143,.2) 50%, rgba(240,185,143,0) 70%);filter:blur(3px);transform:scale(.7);opacity:.5;transition:transform 4s ease-in-out, opacity 4s ease-in-out}
+  #ebreathWord{text-align:center;color:var(--dim);min-height:1.5em}
+  .breakBtn{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:25;background:rgba(36,26,31,.92);border:1px solid rgba(179,203,169,.35);color:var(--sage);border-radius:999px;padding:11px 18px;font-size:15px;display:none}
+  .breakBtn.on{display:block}
+
+  /* disclaimer gate */
+  #gateD{position:fixed;inset:0;z-index:100;background:var(--bg);overflow:auto;display:none}
+  #gateD.on{display:block}
+  body.gated #app{display:none}
 </style>
 </head>
 <body>
 
-<!-- 1. Prepare -->
-<section class="screen on" id="prep">
-  <nav class="modes"><a href="index.html" class="on">KAP session</a><a href="emdr.html">EMDR</a></nav>
-  <a class="discBanner" href="disclaimer.html"><b>Personal project · Not medical advice or treatment.</b> Not reviewed by any clinician. Use at your own risk. In crisis, call or text 988. <u>Full disclaimer</u></a>
-  <h1>Session guide</h1>
-  <div id="resumeCard">
-    <div style="color:var(--accent);font-size:19px">Your last session is saved</div>
-    <p class="muted" id="resumeWhere" style="margin:6px 0 0"></p>
-    <button class="btn" id="resumeSessionBtn">Resume session</button>
-    <button class="link" id="freshBtn">Start a new session instead</button>
+<!-- First-visit notice -->
+<div id="gateD">
+  <div class="wrap">
+    <h1>Hi, and welcome.</h1>
+    <p class="dim">Before anything else, a few honest words, so you know exactly what this is.</p>
+    <div class="card warm">
+      <p><b>This is a personal hobby project.</b> It is not medical advice, therapy or treatment, and it doesn't replace a clinician.</p>
+      <p>It does not give any advice about ketamine or other medicine, including doses. Follow your prescriber.</p>
+      <p style="margin:0">If you're in crisis, call or text <b>988</b> in the US, or your local emergency number.</p>
+    </div>
+    <label class="check"><input type="checkbox" class="dg"> I understand this isn't medical care and I'll follow my clinician's guidance.</label>
+    <label class="check"><input type="checkbox" class="dg"> I'm using this at my own choice and risk.</label>
+    <button class="btn" id="dgGo" disabled>Continue</button>
+    <p class="foot"><a href="disclaimer.html">Read the full disclaimer</a></p>
   </div>
-  <p class="muted">A spoken companion for an at-home ketamine-assisted psychotherapy session, lying in bed. After one tap to start and one tap once you’ve taken your medicine, it runs on its own.</p>
+</div>
 
-  <div class="note">This guide doesn't replace your clinician. Take your medicine exactly as they prescribed, and follow their instructions about food, other medications and having someone with you.</div>
-
-  <h2>Before you begin</h2>
-  <div id="checks">
-    <label class="check"><input type="checkbox"><span>Your sitter or monitor is here, or nearby as your care team arranged</span></label>
-    <label class="check"><input type="checkbox"><span>You’ve followed your clinician’s pre-session instructions</span></label>
-    <label class="check"><input type="checkbox"><span>Bathroom visited, water and a bowl or bag within reach</span></label>
-    <label class="check"><input type="checkbox"><span>Phone on Do Not Disturb, brightness turned down, plugged in</span></label>
-    <label class="check"><input type="checkbox"><span>Eye mask and headphones ready (optional but helpful)</span></label>
-    <label class="check"><input type="checkbox"><span>Nowhere to drive or be for the rest of the day or night</span></label>
+<div id="app">
+<!-- HOME -->
+<section class="screen" id="home"><div class="wrap">
+  <div class="banner">Personal project · not medical advice, therapy or treatment</div>
+  <div class="hello">
+    <h1 id="helloTitle">Welcome. You're in a safe place.</h1>
+    <p class="dim">Take a breath. What would you like today?</p>
   </div>
+  <div id="resumeCard" class="card warm" style="display:none">
+    <b>Your last session was paused</b>
+    <p class="dim small" id="resumeInfo" style="margin:4px 0 0"></p>
+    <button class="btn" id="resumeGo">Continue where I left off</button>
+    <button class="btn quiet" id="resumeDrop">Start fresh instead</button>
+  </div>
+  <button class="choice" data-go="kapSetup"><b>Ketamine session</b><span>A calm voice guides you while you rest in bed. Hardly any tapping needed.</span><div class="tag">Settle in →</div></button>
+  <button class="choice" data-go="emdr"><b>EMDR session</b><span>A gentle, step-by-step guide at your own pace, with a soft moving light.</span><div class="tag">Begin gently →</div></button>
+  <p class="foot">You can take a break at any moment.<br><a href="disclaimer.html">Disclaimer</a> · Crisis support: call or text 988 (US)</p>
+</div></section>
 
-  <h2>Intention</h2>
-  <p class="muted">A few words you'd like to bring into the session. They’ll be read back to you.</p>
-  <textarea id="intention" placeholder="e.g. I want to meet my grief with kindness"></textarea>
+<!-- KAP SETUP -->
+<section class="screen" id="kapSetup"><div class="wrap">
+  <button class="back" data-go="home">← Home</button>
+  <h1>Let's get you comfortable</h1>
+  <p class="dim">Everything here is optional. The defaults are gentle.</p>
 
-  <h2>Voice</h2>
-  <p class="muted">Tap a voice to hear it. The one you tap last is the one that guides you.</p>
+  <h2>Your guide's voice</h2>
+  <p class="dim small">Tap a voice to hear it.</p>
   <div id="voiceList"></div>
 
-  <h2>Length of the journey</h2>
-  <p class="muted">Match this to the session length your care team gave you.</p>
-  <div class="row" id="lenRow">
-    <button class="chip" data-v="40">40 min</button>
-    <button class="chip sel" data-v="60">60 min</button>
-    <button class="chip" data-v="75">75 min</button>
-    <button class="chip" data-v="90">90 min</button>
-  </div>
+  <h2>An intention <span class="dim small">(optional)</span></h2>
+  <textarea id="intention" placeholder="A few words, or a feeling you'd like to carry with you"></textarea>
+
+  <h2>How long</h2>
+  <div class="chips" data-set="len"><button class="chip" data-v="40">40 min</button><button class="chip" data-v="60">60 min</button><button class="chip" data-v="75">75 min</button><button class="chip" data-v="90">90 min</button></div>
 
   <h2>Breathing pace</h2>
-  <p class="muted">Box breathing: in, hold, out, hold. Seconds for each step.</p>
-  <div class="row" id="breathRow">
-    <button class="chip" data-v="4">4 seconds</button>
-    <button class="chip sel" data-v="5">5 seconds</button>
-    <button class="chip" data-v="6">6 seconds</button>
-  </div>
+  <p class="dim small">Box breathing at the start: in, hold, out, hold.</p>
+  <div class="chips" data-set="breath"><button class="chip" data-v="4">4 seconds</button><button class="chip" data-v="5">5 seconds</button><button class="chip" data-v="6">6 seconds</button></div>
 
-  <h2>Voice during the journey</h2>
-  <div class="row" id="cueRow">
-    <button class="chip" data-v="few">Very few</button>
-    <button class="chip sel" data-v="some">Gentle check-ins</button>
-  </div>
+  <h2>During the journey</h2>
+  <div class="chips" data-set="cues"><button class="chip" data-v="few">Very few words</button><button class="chip" data-v="some">Gentle check-ins</button></div>
 
-  <h2>Ending</h2>
-  <div class="row" id="endRow">
-    <button class="chip sel" data-v="return">Return and reflect</button>
-    <button class="chip" data-v="rest">Rest and drift off</button>
-  </div>
+  <h2>At the end</h2>
+  <div class="chips" data-set="end"><button class="chip" data-v="return">Return and reflect</button><button class="chip" data-v="rest">Rest and drift off</button></div>
 
   <h2>Sound</h2>
-  <p class="muted sans" style="font-size:14px">Pick a feel, then fine-tune if you like. Tap <b>Listen while you adjust</b> to hear every change as you make it. Everything saves on its own.</p>
-  <button class="btn ghost" id="testBtn" style="margin:10px 0 4px">▶&nbsp; Listen while you adjust</button>
-  <div class="sndPanel"></div>
-  <div id="sndMaster" hidden>
-    <input type="range" id="voiceVol" min="0" max="100" value="72"><input type="range" id="voiceTone" min="-100" max="100" value="-20">
-    <input type="range" id="softAmt" min="0" max="100" value="45"><input type="range" id="musicVol" min="0" max="100" value="55">
-    <input type="range" id="musicTone" min="0" max="100" value="40"><input type="range" id="duckAmt" min="0" max="100" value="30">
-  </div>
+  <div class="snd" data-panel="setup"></div>
+  <button class="btn soft" id="hearBtn">▶&nbsp; Hear how it sounds</button>
 
-  <button class="btn" id="startBtn" disabled>Loading audio…</button>
-  <p class="muted sans" style="text-align:center;margin-top:12px;font-size:13px">Leave this page open. The screen goes dark but stays on, so the sound keeps playing.</p>
-  <p class="discFoot">Personal hobby project · Not medical advice, therapy or treatment · <a href="disclaimer.html">Disclaimer</a></p>
-</section>
+  <button class="btn" id="kapBegin" disabled>Getting the voice ready…</button>
+  <p class="dim small" style="text-align:center;margin-top:12px">Leave this page open. The screen dims but stays on, so the sound keeps going.</p>
+</div></section>
 
-<!-- 2. Session -->
-<section class="screen" id="session">
-  <div id="phaseLbl"></div>
+<!-- EMDR -->
+<section class="screen" id="emdr"><div class="wrap" id="emdrView" style="padding-bottom:120px"></div></section>
+</div>
+
+<!-- KAP SESSION STAGE -->
+<div class="stage" id="kapStage">
+  <div class="topbar"><button class="pill" id="kapBreak">Take a break</button><button class="pill" id="kapSound">Sound</button></div>
+  <div id="phase"></div>
   <div id="orb"></div>
-  <svg id="bRing" viewBox="-170 -170 340 340" aria-hidden="true"><defs><filter id="ringGlow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle id="bCircle" cx="0" cy="0" r="62" fill="none" stroke="rgba(242,208,170,.62)" stroke-width="1.4" filter="url(#ringGlow)"/></svg>
-  <div id="breathLbl"><span id="bWord"></span><span id="bCount"></span></div>
-  <svg id="ring" viewBox="0 0 150 150"><circle cx="75" cy="75" r="70" fill="none" stroke="#e0b48a" stroke-width="2" stroke-dasharray="440" stroke-dashoffset="440" id="ringC" transform="rotate(-90 75 75)"/></svg>
+  <svg id="bRing" viewBox="-170 -170 340 340" aria-hidden="true"><circle id="bCircle" cx="0" cy="0" r="62" fill="none" stroke="rgba(245,210,180,.7)" stroke-width="1.6"/></svg>
+  <div id="bWord"></div>
   <div id="caption"></div>
-  <div id="tapGate">
-    <div class="big">Tap anywhere<br>once you’ve taken your medicine</div>
-    <div class="small">Then lie back. The guide takes it from there.</div>
-  </div>
-  <button id="sndBtn" aria-label="Sound settings">Sound</button>
-  <div id="sndSheet">
-    <div class="sheetIn snd">
-      <div class="sheetHead"><b>Sound</b><button id="sndClose">Done</button></div>
-      <div class="sndPanel"></div>
-      <p class="sheetNote">Changes are instant and saved. The session keeps playing.</p>
-    </div>
-  </div>
-  <div id="hold">press and hold to pause</div>
-  <div id="pausedLayer">
-    <p style="color:#9a968e;text-align:center">Paused. You’re safe. You’re in your bed.</p>
-    <div class="pvol snd">
-      <label>Voice</label><select id="pVoiceSel" class="pvsel"></select><span id="pVoiceMsg" class="pvmsg"></span>
-      <div class="sndPanel"></div>
-    </div>
-    <button class="btn" id="resumeBtn">Resume</button>
-    <button class="btn ghost" id="endBtn">End session</button>
-  </div>
-</section>
+  <div id="gate"><div><div class="big">Whenever you're ready,<br>take your medicine as prescribed.</div><p class="dim">Then tap anywhere, set the phone down, and lie back.<br>The guide takes it from there.</p></div></div>
+</div>
 
-<!-- 3. Integrate -->
-<section class="screen" id="after">
-  <h1>Welcome back</h1>
-  <p class="muted">Stay lying down for now. When you do get up, go slowly, with your monitor’s help. No driving today.</p>
-  <h2>Notes while it’s fresh</h2>
-  <p class="muted">Write a few words, or come back to this later. Bring it to your next integration session.</p>
-  <p class="sans" style="font-size:15px;color:var(--dim)">• What images, feelings or sensations came up?<br>• Was there a moment that felt important?<br>• What do you want to remember?<br>• How does your intention feel now?</p>
-  <textarea id="journal" style="min-height:200px" placeholder="Anything at all…"></textarea>
-  <button class="btn ghost" id="copyBtn">Copy notes</button>
-  <p class="muted sans" style="font-size:13px;margin-top:8px">Notes are saved only in this browser on this device.</p>
-  <button class="btn ghost" id="againBtn" style="margin-top:30px">Back to start</button>
-</section>
+<!-- EMDR BILATERAL LIGHT -->
+<div id="bls">
+  <div id="dot"></div>
+  <div id="blsMsg">Follow the light with your eyes. Keep your head still.</div>
+  <div id="blsCount"></div>
+  <div class="blsBar"><button class="pill" id="blsStop">Stop this set</button><button class="pill" id="blsBreak" style="color:var(--sage)">I need a break</button></div>
+</div>
+
+<button class="breakBtn" id="emdrBreakBtn">I need a break</button>
+
+<!-- SOUND SHEET -->
+<div class="sheet" id="soundSheet"><div class="in">
+  <div class="head"><b>Sound</b><button class="pill" id="soundDone">Done</button></div>
+  <div class="snd" data-panel="sheet"></div>
+  <div id="sheetVoice" style="margin-top:18px">
+    <div class="name" style="font-size:15px">Guide's voice</div>
+    <select id="voiceSel" style="width:100%;margin-top:8px;background:rgba(0,0,0,.2);border:1px solid var(--faint);border-radius:12px;color:var(--ink);font:15px var(--round);padding:11px"></select>
+    <div class="hint dim small" id="voiceSelMsg" style="min-height:1.3em;margin-top:6px"></div>
+  </div>
+</div></div>
+
+<!-- BREAK -->
+<div id="break"><div class="wrap">
+  <h1 style="font-size:26px">You're safe. Take all the time you need.</h1>
+  <p class="dim">Everything is paused. Nothing is lost.</p>
+  <div id="breakGlow"></div>
+  <p class="dim small">Breathe with the light, if you like.</p>
+  <button class="btn" id="breakResume">I'm ready to continue</button>
+  <button class="btn soft" id="breakGround">Help me feel grounded</button>
+  <div id="ground" class="card">
+    <p><b>Notice, slowly:</b></p>
+    <p>5 things you can see.<br>4 things you can touch, like the blanket or your hands.<br>3 things you can hear.<br>2 things you can smell.<br>1 slow breath, in and out.</p>
+    <p class="dim" style="margin:0">Press your feet into the bed or the floor. You're here, in this room, right now.</p>
+  </div>
+  <button class="btn soft" id="breakSound">Change the sound</button>
+  <button class="btn quiet" id="breakEnd">End the session for today</button>
+  <p class="dim small" style="margin-top:22px">If you're in crisis, call or text <b>988</b> (US) or your local emergency number.</p>
+</div></div>
 
 <script>
-(() => {
-"use strict";
 const $ = s => document.querySelector(s);
-const store = {
-  get(k){ try{ return localStorage.getItem(k) }catch(e){ return null } },
-  set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} }
-};
+const store = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }, del(k){ try{ localStorage.removeItem(k); }catch(e){} } };
+const wait = s => new Promise(r => setTimeout(r, s * 1000));
+const esc = s => String(s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-/* ---------- Settings UI ---------- */
-const settings = { len: 60, cues: "some", end: "return", breath: 5 };
-function chipGroup(id, key, num){
-  const row = $(id);
-  row.addEventListener("click", e => {
-    const b = e.target.closest(".chip"); if(!b) return;
-    row.querySelectorAll(".chip").forEach(c => c.classList.toggle("sel", c===b));
-    settings[key] = num ? +b.dataset.v : b.dataset.v;
-    store.set("kap_"+key, b.dataset.v);
-  });
-  const saved = store.get("kap_"+key);
-  if(saved){ const b = row.querySelector(`[data-v="${saved}"]`); if(b) b.click(); }
+/* ---------------- screens with gentle fades ---------------- */
+let current = null;
+function go(id){
+  if(current === id) return;
+  const prev = current ? $("#" + current) : null, next = $("#" + id);
+  const enter = () => { next.classList.add("on"); window.scrollTo(0, 0); requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add("show"))); };
+  current = id;
+  if(prev){ prev.classList.remove("show"); setTimeout(() => { prev.classList.remove("on"); enter(); }, 700); } else enter();
+  if(id === "home") refreshResume();
+  if(id === "emdr") emdrStart();
+  $("#emdrBreakBtn").classList.toggle("on", id === "emdr");
 }
-chipGroup("#lenRow","len",true); chipGroup("#breathRow","breath",true); chipGroup("#cueRow","cues"); chipGroup("#endRow","end");
-$("#intention").value = store.get("kap_intention") || "";
-$("#intention").addEventListener("input", e => store.set("kap_intention", e.target.value));
-$("#journal").value = store.get("kap_journal") || "";
-$("#journal").addEventListener("input", e => store.set("kap_journal", e.target.value));
-const SND_IDS = ["voiceVol","voiceTone","softAmt","musicVol","musicTone","duckAmt"];
-if(store.get("kap_sound_v3") !== "1"){ SND_IDS.forEach(id => { try{ localStorage.removeItem("kap_"+id); }catch(e){} }); store.set("kap_sound_v3","1"); }
-SND_IDS.forEach(id => {
-  const v = store.get("kap_"+id); if(v) $("#"+id).value = v;
-  $("#"+id).addEventListener("input", e => store.set("kap_"+id, e.target.value));
-});
+function fadeIn(el){ el.classList.add("on"); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("show"))); }
+function fadeOut(el, ms = 1200){ el.classList.remove("show"); return new Promise(r => setTimeout(() => { el.classList.remove("on"); r(); }, ms)); }
+document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if(g) go(g.dataset.go); });
 
-/* ---------- Audio engine: pre-recorded voice + seamless ambient loop ---------- */
+/* ---------------- first-visit notice ---------------- */
+(function(){
+  const ack = +store.get("app_disclaimer_ack_v1") || 0;
+  if(Date.now() - ack > 30 * 864e5){ document.body.classList.add("gated"); $("#gateD").classList.add("on"); }
+  document.querySelectorAll(".dg").forEach(c => c.addEventListener("change", () => { $("#dgGo").disabled = ![...document.querySelectorAll(".dg")].every(x => x.checked); }));
+  $("#dgGo").addEventListener("click", () => { store.set("app_disclaimer_ack_v1", String(Date.now())); $("#gateD").classList.remove("on"); document.body.classList.remove("gated"); });
+})();
+
+/* ---------------- settings ---------------- */
+const DEF = { len:"60", breath:"5", cues:"some", end:"return", voiceVol:"70", bed:"tones", bedVol:"45", soft:"off" };
+const settings = {};
+Object.keys(DEF).forEach(k => settings[k] = store.get("g_" + k) || DEF[k]);
+function setSetting(k, v){ settings[k] = String(v); store.set("g_" + k, String(v)); }
+document.querySelectorAll(".chips[data-set]").forEach(row => {
+  const k = row.dataset.set;
+  row.querySelectorAll(".chip").forEach(c => c.classList.toggle("sel", c.dataset.v === settings[k]));
+  row.addEventListener("click", e => { const c = e.target.closest(".chip"); if(!c) return; setSetting(k, c.dataset.v); row.querySelectorAll(".chip").forEach(x => x.classList.toggle("sel", x === c)); });
+});
+$("#intention").value = store.get("g_intention") || "";
+$("#intention").addEventListener("input", e => store.set("g_intention", e.target.value));
+
+/* ---------------- voices ---------------- */
 const VOICES = [
-  {id:"sulafatn",   name:"Sulafat", d:"Warm, natural, human · guided box breathing", breath:true},
-  {id:"gacruxn",    name:"Gacrux",  d:"Mature, natural, human · guided box breathing", breath:true},
-  {id:"sagecalmp",  name:"Sage · calmest", d:"Slower, lower, deeply peaceful · guided box breathing", breath:true},
-  {id:"avabright",  name:"Ava · bright", d:"Bright, calm and clear · guided box breathing", breath:true},
-  {id:"sagep",      name:"Sage · warm",    d:"Warm and present"},
-  {id:"balladp",    name:"Ballad",     d:"Calm, warm man"},
-  {id:"gacruxp",    name:"Gacrux",     d:"Mature woman, soft and hushed"},
-  {id:"algenibp",   name:"Algenib",    d:"Older man, gravelly, soft and hushed"},
-  {id:"sadaltagerp",name:"Sadaltager", d:"Older man, steady, soft and hushed"},
-  {id:"soniap",     name:"Sonia",      d:"Calm, British woman"},
-  {id:"libbyp",     name:"Libby",      d:"Soft, kind, British woman"},
-  {id:"jennyp",     name:"Jenny",      d:"Soft, comforting, American woman"},
-  {id:"avasoftp",   name:"Ava (hushed)", d:"Tender, intimate, American woman"},
-  {id:"avap",       name:"Ava",        d:"Warm, American woman"},
-  {id:"emmap",      name:"Emma",       d:"Gentle, American woman"},
-  {id:"andrewp",    name:"Andrew",     d:"Warm, steady, American man"},
-  {id:"ryanp",      name:"Ryan",       d:"Grounded, British man"},
+  {id:"sulafatn",   name:"Sulafat",          d:"Warm and natural", breath:true},
+  {id:"gacruxn",    name:"Gacrux",           d:"Mature and natural", breath:true},
+  {id:"sagep",      name:"Sage",             d:"Warm and present"},
+  {id:"sagecalmp",  name:"Sage · calmest",   d:"Slower and lower", breath:true},
+  {id:"avabright",  name:"Ava · bright",     d:"Bright, calm and clear", breath:true},
+  {id:"balladp",    name:"Ballad",           d:"Calm, warm man"},
+  {id:"gacruxp",    name:"Gacrux · hushed",  d:"Soft and hushed"},
+  {id:"algenibp",   name:"Algenib",          d:"Older man, soft and gravelly"},
+  {id:"sadaltagerp",name:"Sadaltager",       d:"Older man, steady"},
+  {id:"soniap",     name:"Sonia",            d:"Calm British woman"},
+  {id:"libbyp",     name:"Libby",            d:"Soft, kind British woman"},
+  {id:"jennyp",     name:"Jenny",            d:"Soft American woman"},
+  {id:"avasoftp",   name:"Ava · hushed",     d:"Tender and intimate"},
+  {id:"avap",       name:"Ava",              d:"Warm American woman"},
+  {id:"emmap",      name:"Emma",             d:"Gentle American woman"},
+  {id:"andrewp",    name:"Andrew",           d:"Warm, steady man"},
+  {id:"ryanp",      name:"Ryan",             d:"Grounded British man"},
 ];
-const SHARED = ["ambient2","bell2"];
+const FAV = ["sulafatn","gacruxn","sagep"];
+const CLIPS = ["test","nudge","prep1","prep2","prep3","prep4","prep5","prep6","onset1","onset2","c1","c2","c3","c4","c5","c6","c7","c8","c9","r1","r2","r3","r4","endReturn","endRest"];
 const BREATH = ["breathIntro","bIn","bHold","bOut","breathOutro"];
 const hasBreath = v => !!(VOICES.find(x => x.id === v) || {}).breath;
 const clipsFor = v => hasBreath(v) ? CLIPS.filter(c => c !== "prep2").concat(BREATH) : CLIPS;
-const CLIPS = ["test","nudge","prep1","prep2","prep3","prep4","prep5","prep6","onset1","onset2",
-  "c1","c2","c3","c4","c5","c6","c7","c8","c9","r1","r2","r3","r4","endReturn","endRest"];
-let voiceId = store.get("kap_voice13") || "sulafatn";
+let voiceId = store.get("g_voice") || store.get("kap_voice13") || "sulafatn";
 if(!VOICES.some(v => v.id === voiceId)) voiceId = "sulafatn";
+
+/* ---------------- audio engine ----------------
+   Everything fades. Nothing starts or stops abruptly. No echo, no bells. */
 const audio = (() => {
-  const LG = {"jennyp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.7,"test":-2.7,"r2":-2.7,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.7},"libby":{"c8":-5.0,"prep3":-5.0,"c9":-5.0,"c1":-5.4,"prep1":-4.4,"endReturn":-4.6,"c5":-4.7,"test":-4.8,"r2":-4.9,"r3":-4.6,"endRest":-4.8,"prep2":-5.0,"onset2":-4.3,"c4":-4.4,"c7":-4.8,"c6":-5.0,"c3":-4.6,"r1":-4.8,"r4":-4.5,"prep4":-4.2,"nudge":-4.7,"prep6":-4.4,"prep5":-4.5,"onset1":-4.7,"c2":-4.5},"soniap":{"c8":-2.6,"prep3":-2.6,"c9":-2.5,"c1":-2.8,"prep1":-2.7,"endReturn":-2.7,"c5":-2.7,"test":-2.8,"r2":-2.6,"r3":-2.6,"endRest":-2.6,"prep2":-2.5,"onset2":-2.4,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.7,"r4":-2.7,"prep4":-2.7,"nudge":-2.4,"prep6":-2.7,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"andrew":{"c8":-4.6,"prep3":-4.8,"c9":-5.6,"c1":-5.1,"prep1":-4.2,"endReturn":-4.6,"c5":-5.2,"test":-4.4,"r2":-5.4,"r3":-4.8,"endRest":-4.6,"prep2":-5.1,"onset2":-4.8,"c4":-5.1,"c7":-4.9,"c6":-6,"c3":-4.8,"r1":-6,"r4":-4.4,"prep4":-4.6,"nudge":-5.0,"prep6":-4.3,"prep5":-4.1,"onset1":-4.6,"c2":-4.9},"ryan":{"c8":-5.5,"prep3":-4.8,"c9":-5.3,"c1":-4.9,"prep1":-4.0,"endReturn":-4.7,"c5":-4.3,"test":-4.3,"r2":-5.1,"r3":-4.6,"endRest":-4.9,"prep2":-4.9,"onset2":-4.4,"c4":-4.9,"c7":-4.8,"c6":-4.9,"c3":-4.3,"r1":-5.0,"r4":-4.9,"prep4":-4.5,"nudge":-4.7,"prep6":-4.4,"prep5":-4.0,"onset1":-4.5,"c2":-4.7},"libbyp":{"c8":-2.7,"prep3":-2.7,"c9":-2.6,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.6,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.7,"c6":-2.6,"c3":-2.6,"r1":-2.5,"r4":-2.7,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.7,"onset1":-2.6,"c2":-2.8},"ava":{"c8":-5.6,"prep3":-4.8,"c9":-4.7,"c1":-4.8,"prep1":-4.4,"endReturn":-4.4,"c5":-5.1,"test":-4.5,"r2":-5.4,"r3":-4.7,"endRest":-4.9,"prep2":-5.2,"onset2":-4.9,"c4":-5.5,"c7":-4.8,"c6":-5.7,"c3":-4.4,"r1":-5.6,"r4":-4.9,"prep4":-4.3,"nudge":-4.8,"prep6":-4.1,"prep5":-4.4,"onset1":-5.0,"c2":-4.7},"algenibp":{"c8":-2.6,"prep3":-2.5,"c9":-2.6,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.7,"r2":-2.5,"r3":-2.6,"endRest":-2.5,"prep2":-2.6,"onset2":-2.5,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.6,"r1":-2.5,"r4":-2.6,"prep4":-2.6,"nudge":-2.7,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"gacrux":{"c8":-1.1,"prep3":0.9,"c9":-3.3,"c1":-1.5,"prep1":-1.2,"endReturn":-2.3,"c5":-2.5,"test":-1.6,"r2":-2.1,"r3":-2.1,"endRest":-1.1,"prep2":-3.0,"onset2":0.5,"c4":0.3,"c7":-0.6,"c6":-1.7,"c3":-1.3,"r1":-5.1,"r4":0.2,"prep4":-0.6,"nudge":-2.1,"prep6":-1.8,"prep5":-1.5,"onset1":-0.3,"c2":-4.4},"sagecalmp":{"c8":-2.7,"prep3":-2.7,"c9":-2.8,"c1":-2.8,"bHold":3.8,"prep1":-2.7,"endReturn":-2.7,"c5":-2.6,"test":-3.0,"r2":-2.7,"r3":-2.6,"breathOutro":-1.8,"bOut":5.3,"breathIntro":-1.9,"bIn":3.5,"endRest":-2.7,"prep2":-2.6,"onset2":-2.7,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.6,"prep5":-2.6,"onset1":-2.7,"c2":-2.4},"balladp":{"c8":-2.9,"prep3":-2.6,"c9":-2.8,"c1":-2.8,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.9,"r2":-2.6,"r3":-2.8,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.5,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"avap":{"c8":-2.5,"prep3":-2.6,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.7,"c5":-2.6,"test":-2.6,"r2":-2.6,"r3":-2.7,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.4,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"am_michael":{"prep3":2.1,"prep1":2.9,"prep2":-0.1,"prep4":1.2,"prep5":1.2},"andrewp":{"c8":-2.7,"prep3":-2.6,"c9":-3.0,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.5,"test":-2.6,"r2":-2.6,"r3":-2.7,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.5,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.7},"algenibw":{"prep3":1.3,"prep1":-0.3,"prep2":0.1},"gracesoft":{"c8":-3.3,"prep3":0.1,"c9":-2.9,"c1":-0.9,"prep1":-2.7,"endReturn":-0.2,"c5":-2.4,"test":-2.0,"r2":-1.3,"r3":-2.5,"endRest":-1.7,"prep2":-2.8,"onset2":-0.9,"c4":-1.9,"c7":-1.2,"c6":0.3,"c3":-2.1,"r1":-1.3,"r4":-0.5,"prep4":-1.3,"nudge":-3.4,"prep6":-0.8,"prep5":-1.2,"onset1":-1.0,"c2":-1.4},"ballad":{"c8":-2.5,"prep3":-0.4,"c9":-3.5,"c1":-3.8,"prep1":-1.8,"endReturn":-2.4,"c5":-1.8,"test":-2.1,"r2":-1.1,"r3":-2.1,"endRest":-3.4,"prep2":-2.3,"onset2":-1.9,"c4":-3.0,"c7":-2.0,"c6":-2.7,"c3":-0.3,"r1":-2.3,"r4":-2.6,"prep4":1.6,"nudge":-1.0,"prep6":-2.5,"prep5":-3.1,"onset1":-1.6,"c2":0.1},"sagep":{"c8":-2.9,"prep3":-2.3,"c9":-3.0,"c1":-2.7,"prep1":-2.7,"endReturn":-2.7,"c5":-2.7,"test":-2.6,"r2":-2.5,"r3":-2.7,"endRest":-2.7,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.8,"c3":-2.6,"r1":-2.7,"r4":-2.6,"prep4":-2.6,"nudge":-2.8,"prep6":-2.6,"prep5":-2.5,"onset1":-2.7,"c2":-2.6},"avabright":{"c8":-4.0,"prep3":-3.0,"c9":-3.4,"c1":-3.3,"bHold":-0.7,"prep1":-2.8,"endReturn":2.3,"c5":-2.6,"test":-3.1,"r2":-1.6,"r3":-0.1,"breathOutro":-2.1,"bOut":-1.6,"breathIntro":-3.0,"bIn":-1.5,"endRest":2.6,"onset2":-2.6,"c4":-2.9,"c7":-2.7,"c6":-3.9,"c3":-3.0,"r1":-1.9,"r4":1.5,"prep4":-2.7,"nudge":-4.1,"prep6":-2.6,"prep5":-2.9,"onset1":-2.8,"c2":-3.5},"sagebright":{"c8":-2.2,"prep3":-3.4,"c9":-2.3,"c1":-3.1,"prep1":-3.1,"endReturn":2.7,"c5":-2.3,"r2":-0.3,"r3":0.5,"onset2":-2.7,"c4":-3.0,"c7":-3.1,"c6":-3.5,"c3":-2.9,"r1":-1.7,"r4":1.4,"prep4":-2.5,"nudge":-2.8,"prep6":-2.5,"prep5":-2.7,"onset1":-3.2,"c2":-2.3},"grace":{"c8":-6,"prep3":-3.6,"c9":-4.8,"c1":-4.7,"prep1":-4.9,"endReturn":-3.3,"c5":-4.7,"test":-5.6,"r2":-4.0,"r3":-5.0,"endRest":-3.8,"prep2":-4.9,"onset2":-3.3,"c4":-3.9,"c7":-3.9,"c6":-3.6,"c3":-5.5,"r1":-4.1,"r4":-3.4,"prep4":-3.2,"nudge":-5.7,"prep6":-3.1,"prep5":-4.3,"onset1":-3.9,"c2":-3.3},"sage":{"c8":-4.2,"prep3":-1.0,"c9":-2.0,"c1":-2.9,"prep1":-0.4,"endReturn":2.6,"c5":-3.0,"test":-2.6,"r2":-3.6,"r3":0.7,"endRest":-2.3,"prep2":0.7,"onset2":-2.0,"c4":-0.5,"c7":0.2,"c6":-1.4,"c3":-1.7,"r1":-0.9,"r4":-1.7,"prep4":-1.1,"nudge":-2.5,"prep6":-0.3,"prep5":0.3,"onset1":-2.0,"c2":-0.6},"sulafatn":{"c8":-2.3,"prep3":-2.2,"c9":-2.2,"c1":-2.4,"bHold":-2.8,"prep1":-2.3,"endReturn":2.6,"c5":-2.4,"test":-2.9,"r2":0.0,"r3":0.6,"breathOutro":-2.7,"bOut":-2.8,"breathIntro":-2.6,"bIn":-2.8,"endRest":2.9,"onset2":-2.4,"c4":-2.5,"c7":-3.0,"c6":-2.8,"c3":-3.0,"r1":-1.8,"r4":1.6,"prep4":-1.8,"nudge":-3.3,"prep6":-1.9,"prep5":-2.0,"onset1":-2.0,"c2":-2.5},"sadaltagerp":{"c8":-2.6,"prep3":-2.5,"c9":-2.6,"c1":-2.5,"prep1":-2.4,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.5,"r3":-2.6,"endRest":-2.5,"prep2":-2.5,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.5,"r4":-2.6,"prep4":-2.5,"nudge":-3.2,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"emma":{"c8":-6,"prep3":-5.2,"c9":-5.7,"c1":-5.2,"prep1":-4.7,"endReturn":-4.6,"c5":-5.7,"test":-4.6,"r2":-5.6,"r3":-5.4,"endRest":-5.0,"prep2":-5.5,"onset2":-4.5,"c4":-5.9,"c7":-4.4,"c6":-6,"c3":-4.4,"r1":-6,"r4":-5.0,"prep4":-4.8,"nudge":-5.2,"prep6":-4.4,"prep5":-4.4,"onset1":-5.5,"c2":-4.8},"sagecalm":{"c8":-3.6,"prep3":-2.1,"c9":-1.4,"c1":-0.4,"prep1":-0.5,"endReturn":-1.4,"c5":0.1,"test":-2.7,"r2":-0.5,"r3":-0.6,"endRest":-0.8,"prep2":0.0,"onset2":-1.1,"c4":-2.4,"c7":-2.9,"c6":-1.3,"c3":-1.5,"r1":-3.0,"r4":-1.3,"prep4":0.5,"nudge":-0.1,"prep6":1.0,"prep5":1.5,"onset1":-3.1,"c2":-1.1},"ryanp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.8,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.8,"r3":-2.5,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.8},"emmap":{"c8":-2.5,"prep3":-2.7,"c9":-2.5,"c1":-2.8,"prep1":-2.7,"endReturn":-2.6,"c5":-2.5,"test":-3.0,"r2":-2.4,"r3":-2.6,"endRest":-2.6,"prep2":-2.4,"onset2":-2.5,"c4":-2.8,"c7":-2.6,"c6":-2.8,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.7,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"sonia":{"c8":-6,"prep3":-5.2,"c9":-5.0,"c1":-5.2,"prep1":-4.7,"endReturn":-4.8,"c5":-4.8,"test":-4.3,"r2":-5.1,"r3":-5.2,"endRest":-4.9,"prep2":-5.5,"onset2":-4.6,"c4":-5.3,"c7":-4.5,"c6":-6,"c3":-4.4,"r1":-5.9,"r4":-4.8,"prep4":-4.5,"nudge":-5.0,"prep6":-4.0,"prep5":-4.7,"onset1":-5.6,"c2":-4.9},"sagew":{"c8":-2.0,"prep3":-0.7,"c9":-1.5,"c1":-1.0,"prep1":-0.9,"endReturn":-1.2,"c5":-1.1,"test":-2.6,"r2":-1.3,"r3":-1.3,"endRest":-1.9,"prep2":0.3,"onset2":-1.4,"c4":0.1,"c7":-1.7,"c6":-3.7,"c3":-0.8,"r1":-2.2,"r4":-2.2,"prep4":-1.1,"nudge":-1.0,"prep6":1.8,"prep5":-2.1,"onset1":-1.1,"c2":-2.6},"gacruxn":{"c8":-3.0,"prep3":-2.6,"c9":-2.4,"c1":-3.0,"bHold":-2.8,"prep1":-2.4,"endReturn":3.3,"c5":-2.9,"test":-2.7,"r2":0.1,"r3":-0.7,"breathOutro":-2.9,"bOut":-0.7,"breathIntro":-1.8,"bIn":-2.8,"endRest":3.4,"onset2":-2.6,"c4":-2.5,"c7":-2.7,"c6":-3.2,"c3":-3.3,"r1":-0.7,"r4":1.4,"prep4":-2.0,"nudge":-3.4,"prep6":-2.4,"prep5":-3.3,"onset1":-2.2,"c2":-2.2},"avasoftp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.5,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.5,"r1":-2.7,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"gacruxp":{"c8":-2.5,"prep3":-2.6,"c9":-2.6,"c1":-2.5,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.8,"r2":-2.5,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"balladc":{"c8":-3.0,"prep3":1.0,"c9":-3.8,"c1":-3.5,"prep1":-1.4,"endReturn":-2.1,"c5":-1.9,"test":-4.4,"r2":2.0,"r3":1.3,"endRest":-3.2,"prep2":0.2,"onset2":-1.0,"c4":-1.0,"c7":-1.7,"c6":-0.1,"c3":-3.0,"r1":-3.2,"r4":0.8,"prep4":0.5,"nudge":-2.5,"prep6":-2.7,"prep5":-0.8,"onset1":-3.2,"c2":-3.8},"algenib":{"c8":-3.5,"prep3":3.0,"c9":-3.3,"c1":0.1,"prep1":0.0,"endReturn":0.8,"c5":-1.3,"test":0.3,"r2":-0.2,"r3":-0.6,"endRest":1.6,"prep2":1.1,"onset2":1.5,"c4":3.9,"c7":-0.1,"c6":-0.9,"c3":1.0,"r1":2.8,"r4":-0.3,"prep4":-1.8,"nudge":-2.6,"prep6":-1.1,"prep5":-1.8,"onset1":-2.1,"c2":-1.7},"sadaltager":{"c8":-1.3,"prep3":1.9,"c9":-3.4,"c1":-1.4,"prep1":0.8,"endReturn":0.6,"c5":0.5,"test":-1.3,"r2":-0.6,"r3":-2.2,"endRest":0.3,"prep2":0.6,"onset2":-0.3,"c4":1.4,"c7":-1.1,"c6":-2.4,"c3":-1.2,"r1":-1.0,"r4":-0.5,"prep4":2.5,"nudge":-1.7,"prep6":-2.1,"prep5":-0.8,"onset1":-0.9,"c2":-1.5},"sagec":{"c8":-1.5,"prep3":-2.3,"c9":-0.1,"c1":1.2,"prep1":-1.9,"endReturn":1.6,"c5":1.8,"test":-2.4,"r2":0.3,"r3":0.3,"endRest":-1.3,"prep2":-1.6,"onset2":-1.6,"c4":-0.7,"c7":-1.1,"c6":-3.1,"c3":-0.6,"r1":-1.6,"r4":-1.7,"prep4":-0.1,"nudge":-3.3,"prep6":3.1,"prep5":-2.0,"onset1":-3.0,"c2":2.7}};   // per-line loudness match (every line lands at the same level)
-  const lineGain = name => Math.pow(10, ((LG[voiceId] || {})[name] || 0) / 20);
-  let ctx, master, music, duck, voice, vLow, vHigh, vSoft, vAir, active = new Set(), mLP, mHS, analyser, loopSrc = null; const buf = {}; const loads = {}; let lvBuf = null; let speaking = 0; let paused = false; const scheduled = [];
+  const LG = {"sulafatn":{"c8":-2.3,"prep3":-2.2,"c9":-2.2,"c1":-2.4,"bHold":-2.8,"prep1":-2.3,"endReturn":2.6,"c5":-2.4,"test":-2.9,"r2":0.0,"r3":0.6,"breathOutro":-2.7,"bOut":-2.8,"breathIntro":-2.6,"bIn":-2.8,"endRest":2.9,"onset2":-2.4,"c4":-2.5,"c7":-3.0,"c6":-2.8,"c3":-3.0,"r1":-1.8,"r4":1.6,"prep4":-1.8,"nudge":-3.3,"prep6":-1.9,"prep5":-2.0,"onset1":-2.0,"c2":-2.5},"gacruxn":{"c8":-3.0,"prep3":-2.6,"c9":-2.4,"c1":-3.0,"bHold":-2.8,"prep1":-2.4,"endReturn":3.3,"c5":-2.9,"test":-2.7,"r2":0.1,"r3":-0.7,"breathOutro":-2.9,"bOut":-0.7,"breathIntro":-1.8,"bIn":-2.8,"endRest":3.4,"onset2":-2.6,"c4":-2.5,"c7":-2.7,"c6":-3.2,"c3":-3.3,"r1":-0.7,"r4":1.4,"prep4":-2.0,"nudge":-3.4,"prep6":-2.4,"prep5":-3.3,"onset1":-2.2,"c2":-2.2},"sagep":{"c8":-2.9,"prep3":-2.3,"c9":-3.0,"c1":-2.7,"prep1":-2.7,"endReturn":-2.7,"c5":-2.7,"test":-2.6,"r2":-2.5,"r3":-2.7,"endRest":-2.7,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.8,"c3":-2.6,"r1":-2.7,"r4":-2.6,"prep4":-2.6,"nudge":-2.8,"prep6":-2.6,"prep5":-2.5,"onset1":-2.7,"c2":-2.6},"sagecalmp":{"c8":-2.7,"prep3":-2.7,"c9":-2.8,"c1":-2.8,"bHold":3.8,"prep1":-2.7,"endReturn":-2.7,"c5":-2.6,"test":-3.0,"r2":-2.7,"r3":-2.6,"breathOutro":-1.8,"bOut":5.3,"breathIntro":-1.9,"bIn":3.5,"endRest":-2.7,"prep2":-2.6,"onset2":-2.7,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.6,"prep5":-2.6,"onset1":-2.7,"c2":-2.4},"avabright":{"c8":-4.0,"prep3":-3.0,"c9":-3.4,"c1":-3.3,"bHold":-0.7,"prep1":-2.8,"endReturn":2.3,"c5":-2.6,"test":-3.1,"r2":-1.6,"r3":-0.1,"breathOutro":-2.1,"bOut":-1.6,"breathIntro":-3.0,"bIn":-1.5,"endRest":2.6,"onset2":-2.6,"c4":-2.9,"c7":-2.7,"c6":-3.9,"c3":-3.0,"r1":-1.9,"r4":1.5,"prep4":-2.7,"nudge":-4.1,"prep6":-2.6,"prep5":-2.9,"onset1":-2.8,"c2":-3.5},"balladp":{"c8":-2.9,"prep3":-2.6,"c9":-2.8,"c1":-2.8,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.9,"r2":-2.6,"r3":-2.8,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.5,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"gacruxp":{"c8":-2.5,"prep3":-2.6,"c9":-2.6,"c1":-2.5,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.8,"r2":-2.5,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"algenibp":{"c8":-2.6,"prep3":-2.5,"c9":-2.6,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.7,"r2":-2.5,"r3":-2.6,"endRest":-2.5,"prep2":-2.6,"onset2":-2.5,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.6,"r1":-2.5,"r4":-2.6,"prep4":-2.6,"nudge":-2.7,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"sadaltagerp":{"c8":-2.6,"prep3":-2.5,"c9":-2.6,"c1":-2.5,"prep1":-2.4,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.5,"r3":-2.6,"endRest":-2.5,"prep2":-2.5,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.5,"r4":-2.6,"prep4":-2.5,"nudge":-3.2,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"soniap":{"c8":-2.6,"prep3":-2.6,"c9":-2.5,"c1":-2.8,"prep1":-2.7,"endReturn":-2.7,"c5":-2.7,"test":-2.8,"r2":-2.6,"r3":-2.6,"endRest":-2.6,"prep2":-2.5,"onset2":-2.4,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.5,"r1":-2.7,"r4":-2.7,"prep4":-2.7,"nudge":-2.4,"prep6":-2.7,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"libbyp":{"c8":-2.7,"prep3":-2.7,"c9":-2.6,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.6,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.7,"c6":-2.6,"c3":-2.6,"r1":-2.5,"r4":-2.7,"prep4":-2.6,"nudge":-2.6,"prep6":-2.6,"prep5":-2.7,"onset1":-2.6,"c2":-2.8},"jennyp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.7,"test":-2.7,"r2":-2.7,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.7},"avasoftp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.5,"r3":-2.6,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.6,"c3":-2.5,"r1":-2.7,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"avap":{"c8":-2.5,"prep3":-2.6,"c9":-2.5,"c1":-2.6,"prep1":-2.6,"endReturn":-2.7,"c5":-2.6,"test":-2.6,"r2":-2.6,"r3":-2.7,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.4,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"emmap":{"c8":-2.5,"prep3":-2.7,"c9":-2.5,"c1":-2.8,"prep1":-2.7,"endReturn":-2.6,"c5":-2.5,"test":-3.0,"r2":-2.4,"r3":-2.6,"endRest":-2.6,"prep2":-2.4,"onset2":-2.5,"c4":-2.8,"c7":-2.6,"c6":-2.8,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.7,"prep5":-2.6,"onset1":-2.6,"c2":-2.6},"andrewp":{"c8":-2.7,"prep3":-2.6,"c9":-3.0,"c1":-2.6,"prep1":-2.6,"endReturn":-2.6,"c5":-2.5,"test":-2.6,"r2":-2.6,"r3":-2.7,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.6,"c7":-2.6,"c6":-2.7,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.5,"nudge":-2.4,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.7},"ryanp":{"c8":-2.6,"prep3":-2.7,"c9":-2.5,"c1":-2.8,"prep1":-2.6,"endReturn":-2.6,"c5":-2.6,"test":-2.6,"r2":-2.8,"r3":-2.5,"endRest":-2.6,"prep2":-2.6,"onset2":-2.6,"c4":-2.7,"c7":-2.6,"c6":-2.6,"c3":-2.6,"r1":-2.6,"r4":-2.6,"prep4":-2.6,"nudge":-2.5,"prep6":-2.6,"prep5":-2.6,"onset1":-2.6,"c2":-2.8}};
+  const lineGain = (v, n) => Math.pow(10, ((LG[v] || {})[n] || 0) / 20);
+  let ctx, master, voiceBus, vSoft, vAir, bedBus, duck, analyser, bedSrc = null, bedName = null, lv;
+  const raw = {}, buf = {}, active = new Set(), scheduled = [];
+  let speaking = 0, paused = false;
+  const BEDS = { tones:"audio/bed_tones.mp3", waves:"audio/bed_waves.mp3" };
   function ensure(){
     if(ctx) return;
-    const AC = window.AudioContext || window.webkitAudioContext; try{ ctx = new AC({ latencyHint: "playback" }); }catch(e){ ctx = new AC(); }   // bigger buffer: no crackles on phones
+    const AC = window.AudioContext || window.webkitAudioContext;
+    try{ ctx = new AC({ latencyHint:"playback" }); }catch(e){ ctx = new AC(); }
     master = ctx.createGain();
-    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -4; lim.knee.value = 8; lim.ratio.value = 6; lim.attack.value = 0.01; lim.release.value = 0.4;   // soft safety limiter, never grabs hard
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -4; lim.knee.value = 8; lim.ratio.value = 6; lim.attack.value = 0.01; lim.release.value = 0.4;
     master.connect(lim); lim.connect(ctx.destination);
-    music = ctx.createGain(); music.gain.value = 0;
-    duck = ctx.createGain(); mLP = ctx.createBiquadFilter(); mLP.type = "lowpass"; mLP.Q.value = 0.5;
-    mHS = ctx.createBiquadFilter(); mHS.type = "highshelf"; mHS.frequency.value = 2500;
-    music.connect(duck); duck.connect(mLP); mLP.connect(mHS); mHS.connect(master);
-    voice = ctx.createGain();
-    vLow = ctx.createBiquadFilter(); vLow.type = "lowshelf"; vLow.frequency.value = 220;
-    vHigh = ctx.createBiquadFilter(); vHigh.type = "highshelf"; vHigh.frequency.value = 3800;
-    vSoft = ctx.createBiquadFilter(); vSoft.type = "peaking"; vSoft.frequency.value = 6500; vSoft.Q.value = 0.9;   // where "s" and "t" sounds bite
-    vAir = ctx.createBiquadFilter(); vAir.type = "highshelf"; vAir.frequency.value = 9500;                         // fizz and hiss above that
-    voice.connect(vLow); vLow.connect(vHigh); vHigh.connect(vSoft); vSoft.connect(vAir); vAir.connect(master);
-    analyser = ctx.createAnalyser(); analyser.fftSize = 1024; analyser.smoothingTimeConstant = 0.6; voice.connect(analyser);
-    lvBuf = new Float32Array(analyser.fftSize);
-    applyVol();
+    voiceBus = ctx.createGain();
+    vSoft = ctx.createBiquadFilter(); vSoft.type = "peaking"; vSoft.frequency.value = 6500; vSoft.Q.value = 0.9;
+    vAir = ctx.createBiquadFilter(); vAir.type = "highshelf"; vAir.frequency.value = 9500;
+    voiceBus.connect(vSoft); vSoft.connect(vAir); vAir.connect(master);
+    analyser = ctx.createAnalyser(); analyser.fftSize = 1024; voiceBus.connect(analyser); lv = new Float32Array(1024);
+    bedBus = ctx.createGain(); bedBus.gain.value = 0; duck = ctx.createGain();
+    bedBus.connect(duck); duck.connect(master);
+    apply(0.05);
   }
-  function applyVol(tc = 0.05){
-    if(!ctx) return;
-    const t = ctx.currentTime;
-    const sa = (+$("#softAmt").value)/100;             // 0 off ... 1 very soft
-    vSoft.gain.setTargetAtTime(-sa * 9, t, tc); vAir.gain.setTargetAtTime(-sa * 10, t, tc);
-    voice.gain.setTargetAtTime(dbGain(+$("#voiceVol").value, 85), t, tc);      // 85 = original level, 100 = about 2x louder
-    const vt = (+$("#voiceTone").value)/100;           // -1 warmer ... +1 clearer
-    vLow.gain.setTargetAtTime(vt < 0 ? -vt*7 : -vt*4, t, tc);
-    vHigh.gain.setTargetAtTime(vt < 0 ? vt*9 : vt*7, t, tc);
-    const mt = (+$("#musicTone").value)/100;           // 0 softer ... 0.5 neutral ... 1 airier
-    if(mt < 0.5){ mLP.frequency.setTargetAtTime(500 * Math.pow(20000/500, mt*2), t, tc); mHS.gain.setTargetAtTime(0, t, tc); }
-    else { mLP.frequency.setTargetAtTime(20000, t, tc); mHS.gain.setTargetAtTime((mt - 0.5) * 2 * 10, t, tc); }
+  // sliders 0..100 -> decibels, so every part of the slider does something
+  const voiceGain = () => { const v = +settings.voiceVol; return v <= 0 ? 0 : Math.pow(10, (v - 70) * 0.2 / 20); };
+  const bedGain = () => { const v = +settings.bedVol; if(settings.bed === "none" || v <= 0) return 0; return 0.35 * Math.pow(10, (v - 45) * 0.2 / 20); };   // default sits ~12 dB under her voice
+  function apply(tc){
+    if(!ctx) return; const t = ctx.currentTime, s = settings.soft === "on";
+    voiceBus.gain.setTargetAtTime(voiceGain(), t, tc);
+    vSoft.gain.setTargetAtTime(s ? -6 : 0, t, tc); vAir.gain.setTargetAtTime(s ? -6 : 0, t, tc);
+    if(bedSrc) bedBus.gain.setTargetAtTime(bedGain(), t, Math.max(tc, 0.6));
   }
-  // slider 0..100 -> loudness in decibels, so every part of the slider is audible (0 = silent)
-  function dbGain(v, unity){ return v <= 0 ? 0 : Math.pow(10, ((v - unity) * 0.42) / 20); }
-  function dipLevel(){ return 1 - 0.85 * (+$("#duckAmt").value/100); }
-  function musicTarget(){ return dbGain(+$("#musicVol").value, 55) * 0.45; }   // 55 (default) = the music bed sits ~8-10 dB under the voice
-  const raw = {};
-  async function fetchSet(paths, onProgress){
-    let n = 0;
-    await Promise.all(paths.map(async p => {
-      if(!raw[p]){ const r = await fetch(p); if(!r.ok) throw new Error(p); raw[p] = await r.arrayBuffer(); }
-      onProgress && onProgress(++n / paths.length);
-    }));
+  async function fetchArr(p){ if(!raw[p]){ const r = await fetch(p); if(!r.ok) throw new Error(p); raw[p] = await r.arrayBuffer(); } return raw[p]; }
+  function decode(ab){ return new Promise((res, rej) => { const p = ctx.decodeAudioData(ab.slice(0), res, rej); if(p && p.then) p.then(res, rej); }); }
+  async function getBuf(p){ if(!buf[p]){ await fetchArr(p); buf[p] = await decode(raw[p]); } return buf[p]; }
+  const clipPath = (v, n) => `audio/${v}/${n}.mp3?s4`;
+  function startSource(b, gainVal, when, fadeSec){
+    const s = ctx.createBufferSource(); s.buffer = b; const g = ctx.createGain();
+    g.gain.setValueAtTime(0, when); g.gain.linearRampToValueAtTime(gainVal, when + fadeSec);
+    s.connect(g); g.connect(voiceBus); s._g = g; s.start(when); return s;
   }
-  const pathsFor = v => SHARED.map(f => `audio/${f}.mp3`).concat(clipsFor(v).map(f => `audio/${v}/${f}.mp3?s4`));
-  function decode(ab){ return new Promise((res, rej) => { const p = ctx.decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej); }); }
   return {
-    preload(v, onProgress){ if(!loads[v]) loads[v] = fetchSet(pathsFor(v), onProgress); else onProgress && onProgress(1); return loads[v]; },
-    async unlockAndDecode(){
-      ensure(); try{ await ctx.resume(); }catch(e){}
-      // tiny silent blip inside the tap, required by iOS
-      const s = ctx.createBufferSource(); s.buffer = ctx.createBuffer(1, 1, 22050); s.connect(ctx.destination); s.start(0);
-      await this.preload(voiceId);
-      for(const p of pathsFor(voiceId)){ if(!buf[p]) buf[p] = await decode(raw[p].slice(0)); }
-    },
-    async decodeVoice(v){ await this.preload(v); for(const p of pathsFor(v)){ if(!buf[p]) buf[p] = await decode(raw[p].slice(0)); } },
     get ctx(){ return ctx; },
-    startMusic(fadeSec=6){
-      if(loopSrc){ const t = ctx.currentTime; music.gain.cancelScheduledValues(t); music.gain.setValueAtTime(music.gain.value, t); music.gain.linearRampToValueAtTime(musicTarget(), t + fadeSec); return; }
-      loopSrc = ctx.createBufferSource(); loopSrc.buffer = buf["audio/ambient2.mp3"]; loopSrc.loop = true;
-      const d = loopSrc.buffer.duration; if(d > 300.05){ loopSrc.loopStart = 0; loopSrc.loopEnd = 300; }
-      loopSrc.connect(music); loopSrc.start();
-      music.gain.cancelScheduledValues(ctx.currentTime);
-      music.gain.setValueAtTime(music.gain.value, ctx.currentTime);
-      music.gain.linearRampToValueAtTime(musicTarget(), ctx.currentTime + fadeSec);
+    async unlock(){ ensure(); try{ await ctx.resume(); }catch(e){} const s = ctx.createBufferSource(); s.buffer = ctx.createBuffer(1, 1, 22050); s.connect(ctx.destination); s.start(0); },
+    async prefetchVoice(v, onP){ const list = clipsFor(v); let n = 0; await Promise.all(list.map(async c => { await fetchArr(clipPath(v, c)); onP && onP(++n / list.length); })); },
+    async decodeVoice(v){ ensure(); for(const c of clipsFor(v)) await getBuf(clipPath(v, c)); },
+    async preview(v){ await this.unlock(); this.stopVoice(); const b = await getBuf(clipPath(v, "test")); const s = startSource(b, lineGain(v, "test"), ctx.currentTime + 0.05, 0.4); active.add(s); s.onended = () => active.delete(s); },
+    apply(slow){ apply(slow ? 0.6 : 0.05); },
+    play(name){ return new Promise(async res => {
+      const p = clipPath(voiceId, name); let b = buf[p]; if(!b){ try{ b = await getBuf(p); }catch(e){ res(); return; } }
+      const s = startSource(b, lineGain(voiceId, name), ctx.currentTime + 0.05, 0.5); active.add(s);
+      speaking++; duck.gain.setTargetAtTime(0.7, ctx.currentTime, 1.5);
+      s.onended = () => { active.delete(s); speaking = Math.max(0, speaking - 1); if(!speaking) duck.gain.setTargetAtTime(1, ctx.currentTime, 3); res(); };
+    }); },
+    playAt(name, when){ const b = buf[clipPath(voiceId, name)]; if(!b) return; const s = startSource(b, lineGain(voiceId, name), when, 0.2); scheduled.push(s); },
+    stopScheduled(){ const t = ctx ? ctx.currentTime : 0; scheduled.splice(0).forEach(s => { try{ s._g.gain.cancelScheduledValues(t); s._g.gain.setTargetAtTime(0, t, 0.1); s.stop(t + 0.6); }catch(e){} }); },
+    stopVoice(){ if(!ctx) return; const t = ctx.currentTime; active.forEach(s => { try{ s._g.gain.cancelScheduledValues(t); s._g.gain.setTargetAtTime(0, t, 0.15); s.stop(t + 0.9); }catch(e){} }); active.clear(); speaking = 0; duck.gain.setTargetAtTime(1, t, 2); },
+    async startBed(fadeSec = 20){
+      ensure(); const want = settings.bed;
+      if(want === "none"){ this.stopBed(3); return; }
+      if(bedSrc && bedName === want){ const t = ctx.currentTime; bedBus.gain.cancelScheduledValues(t); bedBus.gain.setValueAtTime(bedBus.gain.value, t); bedBus.gain.linearRampToValueAtTime(bedGain(), t + fadeSec); return; }
+      if(bedSrc) this.stopBed(3);
+      const b = await getBuf(BEDS[want]); if(settings.bed !== want) return;
+      const s = ctx.createBufferSource(); s.buffer = b; s.loop = true; s.loopStart = 0; s.loopEnd = Math.min(240, b.duration);
+      const g = ctx.createGain(); s.connect(g); g.connect(bedBus); s._g = g;
+      const t = ctx.currentTime; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(1, t + Math.min(fadeSec, 4));
+      bedBus.gain.cancelScheduledValues(t); bedBus.gain.setValueAtTime(bedSrc ? bedBus.gain.value : 0, t); bedBus.gain.linearRampToValueAtTime(bedGain(), t + fadeSec);
+      s.start(t); bedSrc = s; bedName = want;
     },
-    setVolume(slow){ if(!ctx) return; applyVol(slow ? 0.5 : 0.05); if(speaking) duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 0.3); if(loopSrc) music.gain.setTargetAtTime(musicTarget(), ctx.currentTime, slow ? 0.8 : 0.4); },
-    stopVoice(){ if(!ctx) return; const t = ctx.currentTime; active.forEach(s => { try{ s._fg.gain.cancelScheduledValues(t); s._fg.gain.setTargetAtTime(0, t, 0.15); s.stop(t + 0.8); }catch(e){} }); active.clear(); },
-    fadeMusic(sec){ if(!ctx) return; const t = ctx.currentTime; music.gain.cancelScheduledValues(t); music.gain.setValueAtTime(music.gain.value, t); music.gain.linearRampToValueAtTime(0, t + sec); },
-    stopMusic(){ if(loopSrc){ try{ loopSrc.stop(ctx.currentTime + 0.5); }catch(e){} music.gain.setTargetAtTime(0, ctx.currentTime, 0.1); loopSrc = null; } },
-    bell(level=1){ const b = buf["audio/bell2.mp3"]; if(!b) return; const s = ctx.createBufferSource(); s.buffer = b; const g = ctx.createGain();
-      const t = ctx.currentTime + 0.05, L = level * 0.5; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(L, t + 1.2);   // swells in like a bowed bowl
-      const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 2500;
-      s.connect(lp); lp.connect(g); g.connect(voice); s.start(t); },
-    playAt(name, when){
-      const b = buf[`audio/${voiceId}/${name}.mp3?s4`]; if(!b) return;
-      const s = ctx.createBufferSource(); s.buffer = b; const fg = ctx.createGain();
-      fg.gain.setValueAtTime(0, when); fg.gain.linearRampToValueAtTime(lineGain(name), when + 0.25); s._fg = fg;
-      s.connect(fg); fg.connect(voice); s.start(when); scheduled.push(s);
-      s.onended = () => { const i = scheduled.indexOf(s); if(i >= 0) scheduled.splice(i, 1); };
-    },
-    stopScheduled(){ const t = ctx ? ctx.currentTime : 0; scheduled.splice(0).forEach(s => { try{ if(s._fg){ s._fg.gain.cancelScheduledValues(t); s._fg.gain.setTargetAtTime(0, t, 0.08); } s.stop(t + 0.4); }catch(e){} }); },
-    play(name){
-      return new Promise(res => {
-        const b = buf[`audio/${voiceId}/${name}.mp3?s4`]; if(!b){ res(); return; }
-        const s = ctx.createBufferSource(); s.buffer = b; const fg = ctx.createGain(); const t0 = ctx.currentTime + 0.05;
-        fg.gain.setValueAtTime(0, t0); fg.gain.linearRampToValueAtTime(lineGain(name), t0 + 0.5);      // half-second fade-in
-        s.connect(fg); fg.connect(voice); s._fg = fg; active.add(s);
-        speaking++; duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 1.5);
-        s.onended = () => { active.delete(s); speaking = Math.max(0, speaking-1); if(!speaking) duck.gain.setTargetAtTime(1, ctx.currentTime, 3.5); res(); };
-        s.start(t0);
-      });
-    },
-    level(){ if(!analyser || ctx.state !== "running") return 0; analyser.getFloatTimeDomainData(lvBuf); let s = 0; for(let i=0;i<lvBuf.length;i++) s += lvBuf[i]*lvBuf[i]; return Math.min(1, Math.sqrt(s/lvBuf.length) * 5); },
-    pause(){ if(!ctx) return; const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(0, t, 0.12); setTimeout(() => { if(paused) ctx.suspend(); }, 700); paused = true; },
-    resume(){ if(!ctx) return; paused = false; ctx.resume().then(() => { const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(1, t, 0.25); }); },
+    stopBed(fadeSec = 4){ if(!bedSrc) return; const s = bedSrc, t = ctx.currentTime; s._g.gain.cancelScheduledValues(t); s._g.gain.setValueAtTime(s._g.gain.value, t); s._g.gain.linearRampToValueAtTime(0, t + fadeSec); try{ s.stop(t + fadeSec + 0.2); }catch(e){} bedSrc = null; bedName = null; },
+    get bedOn(){ return !!bedSrc; },
+    pause(){ if(!ctx || paused) return; paused = true; const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(0, t, 0.15); setTimeout(() => { if(paused) ctx.suspend(); }, 800); },
+    resume(){ if(!ctx) return; paused = false; ctx.resume().then(() => { const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(1, t, 0.35); }); },
+    level(){ if(!analyser) return 0; analyser.getFloatTimeDomainData(lv); let s = 0; for(let i = 0; i < lv.length; i++) s += lv[i] * lv[i]; return Math.sqrt(s / lv.length); },
+    // EMDR: a very soft tone on one side
+    tone(side){ ensure(); const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(), p = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+      o.type = "sine"; o.frequency.value = 392; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.06 * voiceGain(), t + 0.08); g.gain.setTargetAtTime(0, t + 0.2, 0.12);
+      o.connect(g); if(p){ p.pan.value = side; g.connect(p); p.connect(master); } else g.connect(master); o.start(t); o.stop(t + 1.2); },
   };
 })();
-// Wait using the audio clock, so pausing (which suspends audio) also pauses the script.
-function wait(sec){
-  const c = audio.ctx; const end = c.currentTime + sec;
-  return new Promise(res => { const iv = setInterval(() => { if(c.currentTime >= end){ clearInterval(iv); res(); } }, 200); });
+
+/* ---------------- sound panel (same panel in setup and in the sheet) ---------------- */
+function panelHTML(){ return `
+  <div class="row"><div class="name">Guide's voice volume</div><input type="range" min="0" max="100" data-k="voiceVol" aria-label="Guide's voice volume"><div class="ends"><span>Quieter</span><span>Louder</span></div></div>
+  <div class="row"><div class="name">Soften sharp sounds</div><div class="hint">Takes the edge off hissy “s” and “t” sounds</div>
+    <div class="toggle" data-k="soft"><button data-v="off">Natural</button><button data-v="on">Softer</button></div></div>
+  <div class="row"><div class="name">Background</div>
+    <div class="toggle" data-k="bed"><button data-v="tones">Warm tones</button><button data-v="waves">Soft waves</button><button data-v="none">Silence</button></div></div>
+  <div class="row bedVolRow"><div class="name">Background volume</div><input type="range" min="1" max="100" data-k="bedVol" aria-label="Background volume"><div class="ends"><span>Barely there</span><span>Fuller</span></div></div>`; }
+document.querySelectorAll(".snd[data-panel]").forEach(p => p.innerHTML = panelHTML());
+function syncPanels(){
+  document.querySelectorAll(".snd input[data-k]").forEach(i => i.value = settings[i.dataset.k]);
+  document.querySelectorAll(".snd .toggle").forEach(t => t.querySelectorAll("button").forEach(b => b.classList.toggle("sel", b.dataset.v === settings[t.dataset.k])));
+  document.querySelectorAll(".bedVolRow").forEach(r => r.style.opacity = settings.bed === "none" ? .35 : 1);
 }
-function loadVoice(){
-  const want = voiceId, b = $("#startBtn");
-  b.disabled = true; b.textContent = "Loading voice…";
-  audio.preload(want, p => { if(voiceId===want) b.textContent = `Loading voice… ${Math.round(p*100)}%`; })
-    .then(() => { if(voiceId===want){ b.disabled = false; b.textContent = "Begin"; } })
-    .catch(() => { if(voiceId===want) b.textContent = "Couldn’t load audio. Reload the page"; });
-}
-// Voice picker with previews
-const preview = new Audio(); preview.preload = "none";
-const FAVORITES = ["sulafatn","gacruxn","sagep"];
-function voiceBtn(v){ return `<button class="voice${v.id===voiceId?" sel":""}" data-id="${v.id}"><span class="play">▶</span><span><b>${v.name}</b><span class="d">${v.d}</span></span></button>`; }
+document.addEventListener("input", e => { const i = e.target.closest(".snd input[data-k]"); if(!i) return; setSetting(i.dataset.k, i.value); syncPanels(); audio.apply(false); });
+document.addEventListener("click", e => {
+  const b = e.target.closest(".snd .toggle button"); if(!b) return;
+  const k = b.closest(".toggle").dataset.k; setSetting(k, b.dataset.v); syncPanels(); audio.apply(true);
+  if(k === "bed" && (audio.bedOn || hearing || kap.phase !== "idle")) audio.startBed(4);
+});
+syncPanels();
+function openSound(){ syncPanels(); fillVoiceSel(); $("#soundSheet").classList.add("on"); }
+$("#soundDone").addEventListener("click", () => $("#soundSheet").classList.remove("on"));
+
+/* ---------------- voice list ---------------- */
+function voiceBtn(v){ return `<button class="voice${v.id === voiceId ? " sel" : ""}" data-id="${v.id}"><span class="pl">▶</span><span><b>${v.name}</b><small>${v.d}</small></span></button>`; }
 function renderVoices(){
-  const favs = FAVORITES.map(id => VOICES.find(v => v.id === id)).filter(Boolean);
-  const others = VOICES.filter(v => !FAVORITES.includes(v.id));
-  const wasOpen = $("#otherVoices") ? $("#otherVoices").open : others.some(v => v.id === voiceId);
-  $("#voiceList").innerHTML = favs.map(voiceBtn).join("") +
-    `<details id="otherVoices" class="others"${wasOpen ? " open" : ""}><summary>Other voices <span>(${others.length})</span></summary><div class="othersInner">${others.map(voiceBtn).join("")}</div></details>`;
+  const favs = FAV.map(id => VOICES.find(v => v.id === id)), others = VOICES.filter(v => !FAV.includes(v.id));
+  const open = $("#otherV") ? $("#otherV").open : others.some(v => v.id === voiceId);
+  $("#voiceList").innerHTML = favs.map(voiceBtn).join("") + `<details id="otherV"${open ? " open" : ""}><summary>More voices (${others.length})</summary>${others.map(voiceBtn).join("")}</details>`;
 }
 $("#voiceList").addEventListener("click", e => {
-  const el = e.target.closest(".voice"); if(!el) return;
-  voiceId = el.dataset.id; store.set("kap_voice13", voiceId); renderVoices();
-  try{ preview.pause(); preview.src = `audio/${voiceId}/test.mp3?s4`; preview.currentTime = 0; preview.play().catch(()=>{}); }catch(err){}
-  loadVoice();
+  const b = e.target.closest(".voice"); if(!b) return;
+  voiceId = b.dataset.id; store.set("g_voice", voiceId); renderVoices(); audio.preview(voiceId).catch(() => {}); prepareVoice();
 });
-renderVoices(); loadVoice();
-
-/* ---------- Session engine ---------- */
-const state = { phase:"idle", paused:false, events:[], j0:0, timer:null, wake:null, run:0 };
-function setPhaseLabel(t){ $("#phaseLbl").textContent = t; }
-function caption(t){ const c=$("#caption"); c.style.opacity = t ? 1 : 0; if(t) c.textContent = t; }
-async function requestWake(){ try{ if("wakeLock" in navigator) state.wake = await navigator.wakeLock.request("screen"); }catch(e){} }
-document.addEventListener("visibilitychange", () => { if(document.visibilityState==="visible" && !["idle","done"].includes(state.phase)) requestWake(); });
-function show(id){ document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id===id)); }
-
-/* ---------- Sound panel: moods + plain-language controls ---------- */
-const MOODS = [
-  {k:"soft",   name:"Soft & close",   d:"The gentle default",      v:{voiceVol:72, voiceTone:-20, softAmt:45, musicVol:55, musicTone:40, duckAmt:30}},
-  {k:"cozy",   name:"Warm & cozy",    d:"Rounder, darker, wrapped", v:{voiceVol:70, voiceTone:-55, softAmt:60, musicVol:58, musicTone:24, duckAmt:25}},
-  {k:"clear",  name:"Clear & calm",   d:"Easiest to follow",        v:{voiceVol:76, voiceTone:15,  softAmt:35, musicVol:46, musicTone:50, duckAmt:40}},
-  {k:"sleepy", name:"Quiet & sleepy", d:"Low and hushed",           v:{voiceVol:60, voiceTone:-40, softAmt:65, musicVol:44, musicTone:18, duckAmt:20}},
-  {k:"voice",  name:"Just her voice", d:"No background sound",      v:{voiceVol:72, voiceTone:-20, softAmt:45, musicVol:0,  musicTone:40, duckAmt:0}},
-];
-const CTRL = [
-  {head:"Her voice"},
-  {id:"voiceVol",  name:"How loud she is",          lo:"Quieter", hi:"Louder", min:0, max:100},
-  {id:"voiceTone", name:"How her voice feels",      lo:"Warmer, rounder", hi:"Clearer, crisper", min:-100, max:100},
-  {id:"softAmt",   name:"Soften sharp sounds", hint:"Takes the edge off hissy “s”, “t” and “sh” sounds", lo:"Off", hi:"Very soft", min:0, max:100},
-  {head:"Background sound"},
-  {id:"musicVol",  name:"How loud it is",           lo:"Off", hi:"Fuller", min:0, max:100},
-  {id:"musicTone", name:"How it feels",             lo:"Darker, muffled", hi:"Lighter, airy", min:0, max:100},
-  {id:"duckAmt",   name:"Gets quieter while she talks", hint:"So her words are easy to hear", lo:"Not at all", hi:"A lot", min:0, max:100},
-];
-const panelHTML = () => `<div class="moods">${MOODS.map(m => `<button type="button" class="mood" data-mood="${m.k}"><b>${m.name}</b><span>${m.d}</span></button>`).join("")}</div>
-  <div class="mixNote"></div>
-  ${CTRL.map(c => c.head ? `<div class="ctlHead">${c.head}</div>` : `<div class="ctl"><div class="ctlName">${c.name}${c.hint ? `<small>${c.hint}</small>` : ""}</div>
-    <input type="range" data-mirror="${c.id}" min="${c.min}" max="${c.max}" aria-label="${c.name}"><div class="ends"><span>${c.lo}</span><span>${c.hi}</span></div></div>`).join("")}
-  <button type="button" class="resetSnd">Back to the gentle default</button>`;
-document.querySelectorAll(".sndPanel").forEach(p => p.innerHTML = panelHTML());
-function currentMood(){ return MOODS.find(m => SND_IDS.every(id => Math.abs(+$("#"+id).value - m.v[id]) < 1)); }
-function syncPanels(){
-  document.querySelectorAll("[data-mirror]").forEach(el => { el.value = $("#"+el.dataset.mirror).value; });
-  const m = currentMood();
-  document.querySelectorAll(".mood").forEach(b => b.classList.toggle("sel", !!m && b.dataset.mood === m.k));
-  document.querySelectorAll(".mixNote").forEach(n => n.textContent = m ? "" : "Your own mix · saved");
+function fillVoiceSel(){
+  const s = $("#voiceSel"), favs = FAV.map(id => VOICES.find(v => v.id === id)), others = VOICES.filter(v => !FAV.includes(v.id));
+  s.innerHTML = `<optgroup label="Favorites">${favs.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</optgroup><optgroup label="More voices">${others.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</optgroup>`;
+  s.value = voiceId; $("#voiceSelMsg").textContent = "";
+  $("#sheetVoice").style.display = kap.phase === "idle" ? "none" : "block";
 }
-function setSound(vals, slow){ Object.entries(vals).forEach(([id, v]) => { $("#"+id).value = v; store.set("kap_"+id, String(v)); }); syncPanels(); audio.setVolume(slow); }
-document.addEventListener("input", e => { const el = e.target.closest("[data-mirror]"); if(!el) return; setSound({[el.dataset.mirror]: el.value}, false); });
-document.addEventListener("click", e => {
-  const m = e.target.closest(".mood"); if(m){ e.stopPropagation(); setSound(MOODS.find(x => x.k === m.dataset.mood).v, true); return; }
-  if(e.target.closest(".resetSnd")){ e.stopPropagation(); setSound(MOODS[0].v, true); }
-}, true);
-syncPanels();
-
-// Listen while you adjust: music + her voice, on repeat, until tapped again
-let listening = false;
-$("#testBtn").addEventListener("click", async () => {
-  const b = $("#testBtn");
-  if(listening){ listening = false; b.classList.remove("on"); b.innerHTML = "▶&nbsp; Listen while you adjust"; audio.stopVoice(); audio.fadeMusic(1.5); setTimeout(() => { if(!listening) audio.stopMusic(); }, 1700); return; }
-  try{ preview.pause(); }catch(e){}
-  listening = true; b.classList.add("on"); b.innerHTML = "■&nbsp; Stop listening";
-  await audio.unlockAndDecode(); audio.startMusic(2);
-  await wait(1.5);
-  while(listening){ await audio.play("test"); if(listening) await wait(2.5); }
+$("#voiceSel").addEventListener("change", async e => {
+  const id = e.target.value, m = $("#voiceSelMsg"); m.textContent = "Getting that voice ready…";
+  try{ await audio.prefetchVoice(id); await audio.decodeVoice(id); voiceId = id; store.set("g_voice", id); renderVoices(); m.textContent = "Changed. You'll hear her from the next words on."; }
+  catch(err){ m.textContent = "That voice didn't load, so nothing changed."; e.target.value = voiceId; }
 });
-function stopListening(){ if(listening) $("#testBtn").click(); }
+let prepToken = 0;
+function prepareVoice(){
+  const b = $("#kapBegin"), me = ++prepToken; b.disabled = true; b.textContent = "Getting the voice ready…";
+  audio.prefetchVoice(voiceId, p => { if(me === prepToken) b.textContent = `Getting the voice ready… ${Math.round(p * 100)}%`; })
+    .then(() => { if(me === prepToken){ b.disabled = false; b.textContent = "I'm ready. Begin"; } })
+    .catch(() => { if(me === prepToken) b.textContent = "The voice didn't load. Please reload the page."; });
+}
+renderVoices(); prepareVoice();
 
-$("#startBtn").addEventListener("click", async () => {
-  try{ preview.pause(); }catch(e){} if(listening){ listening = false; $("#testBtn").classList.remove("on"); $("#testBtn").innerHTML = "▶&nbsp; Listen while you adjust"; audio.stopVoice(); audio.stopMusic(); }
-  const b = $("#startBtn"); b.disabled = true; b.textContent = "Starting…";
-  try{ await audio.unlockAndDecode(); }catch(e){ b.textContent = "Audio failed to start. Reload and try again"; return; }
-  requestWake();
-  show("session"); $("#session").classList.add("on");
-  b.disabled = false; b.textContent = "Begin";
-  clearProgress();
-  runPrep(++state.run);
+/* "Hear how it sounds": background + her voice, on repeat, until tapped again */
+let hearing = false;
+$("#hearBtn").addEventListener("click", async () => {
+  const b = $("#hearBtn");
+  if(hearing){ hearing = false; b.innerHTML = "▶&nbsp; Hear how it sounds"; audio.stopVoice(); audio.stopBed(2); return; }
+  hearing = true; b.innerHTML = "■&nbsp; Stop"; await audio.unlock();
+  audio.startBed(3); await wait(2);
+  while(hearing){ await audio.play("test"); if(hearing) await wait(3); }
+});
+function stopHearing(){ if(hearing){ hearing = false; $("#hearBtn").innerHTML = "▶&nbsp; Hear how it sounds"; audio.stopVoice(); audio.stopBed(1.5); } }
+
+/* ---------------- KAP session ---------------- */
+const kap = { phase:"idle", run:0, events:[], j0:0, timer:null, breath:null, wake:null, prepIndex:0, nudge:null };
+const SAVE = "g_kap_progress";
+async function wakeLock(){ try{ if("wakeLock" in navigator) kap.wake = await navigator.wakeLock.request("screen"); }catch(e){} }
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && !["idle","done"].includes(kap.phase)) wakeLock(); });
+function setPhase(t){ $("#phase").textContent = t; }
+function caption(t){ const c = $("#caption"); if(t){ c.textContent = t; c.style.opacity = 1; } else c.style.opacity = 0; }
+function saveProgress(){
+  if(kap.phase === "idle" || kap.phase === "done") return;
+  const elapsed = kap.phase === "journey" ? audio.ctx.currentTime - kap.j0 : 0;
+  store.set(SAVE, JSON.stringify({ at:Date.now(), phase:kap.phase, prepIndex:kap.prepIndex, elapsed, events:kap.events, voice:voiceId, len:settings.len }));
+}
+function clearProgress(){ store.del(SAVE); }
+function loadProgress(){ try{ const s = JSON.parse(store.get(SAVE)); if(s && Date.now() - s.at < 12 * 3600e3) return s; }catch(e){} return null; }
+function refreshResume(){
+  const s = loadProgress(), c = $("#resumeCard"); if(!s){ c.style.display = "none"; return; }
+  const where = s.phase === "journey" ? `about ${Math.round(s.elapsed / 60)} minutes into the journey` : s.phase === "gate" ? "just before taking your medicine" : "while settling in";
+  $("#resumeInfo").textContent = `You stopped ${where}.`; c.style.display = "block";
+}
+$("#resumeDrop").addEventListener("click", () => { clearProgress(); refreshResume(); });
+$("#resumeGo").addEventListener("click", async () => {
+  const s = loadProgress(); if(!s) return;
+  if(VOICES.some(v => v.id === s.voice)) voiceId = s.voice;
+  $("#resumeGo").textContent = "Getting ready…";
+  await audio.unlock(); await audio.prefetchVoice(voiceId); await audio.decodeVoice(voiceId);
+  $("#resumeGo").textContent = "Continue where I left off";
+  enterStage(); const run = ++kap.run; audio.startBed(15);
+  if(s.phase === "journey"){ await wait(4); startJourney(s); }
+  else if(s.phase === "gate"){ await wait(3); showGate(); }
+  else runPrep(run, s.prepIndex || 0);
 });
 
-async function runPrep(run, from=0){
-  state.phase = "prep"; setPhaseLabel("Settling");
-  audio.startMusic(15);
-  if(from === 0){ await wait(3); audio.bell(); await wait(6); } else { await wait(4); }
+$("#kapBegin").addEventListener("click", async () => {
+  stopHearing(); const b = $("#kapBegin"); b.disabled = true; b.textContent = "Starting gently…";
+  try{ await audio.unlock(); await audio.decodeVoice(voiceId); }catch(e){ b.textContent = "Sound didn't start. Please reload and try again."; return; }
+  b.disabled = false; b.textContent = "I'm ready. Begin";
+  clearProgress(); enterStage(); runPrep(++kap.run, 0);
+});
+function enterStage(){ fadeIn($("#kapStage")); wakeLock(); kap.phase = "prep"; touchIdle(); }
+let idleT = null;
+function touchIdle(){ $("#kapStage").classList.remove("idle"); clearTimeout(idleT); idleT = setTimeout(() => $("#kapStage").classList.add("idle"), 15000); }
+$("#kapStage").addEventListener("pointerdown", touchIdle);
+
+async function runPrep(run, from){
+  kap.phase = "prep"; setPhase("Settling in");
+  audio.startBed(20);
+  await wait(from === 0 ? 6 : 4);
   const intent = $("#intention").value.trim();
   const steps = ["prep1","prep2","prep3","prep4","prep5","prep6"];
   for(let i = from; i < steps.length; i++){
-    const name = steps[i];
-    if(state.run !== run) return;
-    state.prepIndex = i; saveProgress();
-    if(name === "prep4" && intent) caption(intent);
-    if(name === "prep2") await boxBreathing(run);
-    else await audio.play(name);
-    if(name === "prep4") setTimeout(() => caption(""), 6000);
-    await wait(name === "prep2" ? 6 : 4);
+    if(kap.run !== run) return;
+    await untilResumed(); if(kap.run !== run) return;
+    kap.prepIndex = i; saveProgress();
+    const n = steps[i];
+    if(n === "prep4" && intent) caption(intent);
+    if(n === "prep2") await boxBreathing(run); else await audio.play(n);
+    if(n === "prep4") setTimeout(() => caption(""), 6000);
+    await wait(n === "prep2" ? 5 : 4);
   }
-  if(state.run !== run) return;
-  showGate();
+  if(kap.run === run) showGate();
 }
-// Box breathing: 4 in, 4 hold, 4 out, 4 hold. Cues are scheduled on the audio clock so they land exactly on the beat.
-const BOX = { cycles: 4, voiced: 2 };
+function untilResumed(){ return new Promise(r => { const c = () => paused ? setTimeout(c, 400) : r(); c(); }); }
 async function boxBreathing(run){
-  const voiced = hasBreath(voiceId), T = settings.breath || 5;
-  if(voiced) await audio.play("breathIntro");
-  else { caption("Let's breathe together. Follow the light: in as it grows, hold, out as it softens, hold."); await wait(7); caption(""); }
+  const voiced = hasBreath(voiceId), T = +settings.breath || 5, cycles = 4;
+  if(!voiced){ await audio.play("prep2"); return; }
+  await audio.play("breathIntro");
+  await wait(2); if(kap.run !== run) return;
+  const t0 = audio.ctx.currentTime + 1.0, cues = ["bIn","bHold","bOut","bHold"];
+  kap.breath = { t0, T, cycles };
+  if(voiced) for(let k = 0; k < 2; k++) for(let p = 0; p < 4; p++) audio.playAt(cues[p], t0 + (k * 4 + p) * T);
+  while(kap.run === run && kap.breath && audio.ctx.currentTime < t0 + cycles * 4 * T) await wait(0.5);
+  kap.breath = null; if(kap.run !== run) return;
   await wait(2);
-  if(state.run !== run) return;
-  const c = audio.ctx, t0 = c.currentTime + 1.0, cues = ["bIn","bHold","bOut","bHold"];
-  state.breath = { t0, T, cycles: BOX.cycles };
-  if(voiced) for(let k = 0; k < BOX.voiced; k++) for(let p = 0; p < 4; p++) audio.playAt(cues[p], t0 + (k*4 + p) * T);
-  await wait(1.0 + BOX.cycles * 4 * T);
-  state.breath = null;
-  if(state.run !== run) return;
-  await wait(2.0);
   if(voiced) await audio.play("breathOutro");
 }
 function showGate(){
-  state.phase = "gate"; setPhaseLabel("");
-  $("#tapGate").classList.add("on");
-  clearInterval(state.gateNudge);
-  state.gateNudge = setInterval(() => { if(state.phase==="gate" && !state.paused) audio.play("nudge"); }, 180000);
-  saveProgress();
+  kap.phase = "gate"; setPhase(""); fadeIn($("#gate")); saveProgress();
+  clearInterval(kap.nudge); kap.nudge = setInterval(() => { if(kap.phase === "gate" && !paused) audio.play("nudge"); }, 240000);
 }
-
-$("#tapGate").addEventListener("click", () => {
-  if(state.phase !== "gate") return;
-  clearInterval(state.gateNudge);
-  $("#tapGate").classList.remove("on");
-  audio.resume(); requestWake();
-  startJourney();
+$("#gate").addEventListener("click", async () => {
+  if(kap.phase !== "gate") return; clearInterval(kap.nudge);
+  await fadeOut($("#gate")); startJourney(null);
 });
-
 function buildEvents(){
-  const L = settings.len * 60, ev = [];
-  const add = (t, k, n) => ev.push({t, k, n, done:false});
-  add(2, "bell");
-  add(12, "say", "onset1");
-  add(Math.min(150, L*0.06), "say", "onset2");
-  const bodyStart = L*0.12, bodyEnd = L*0.80;
-  const spacing = settings.cues === "few" ? 15*60 : 7*60;
-  const n = Math.max(1, Math.floor((bodyEnd - bodyStart) / spacing));
-  // Journey arc plays in order: opening, going deep, meeting what comes, softening
+  const L = +settings.len * 60, ev = [], add = (t, n) => ev.push({ t, n, done:false });
+  add(15, "onset1"); add(Math.min(150, L * 0.06), "onset2");
+  const a = L * 0.12, z = L * 0.80, n = Math.max(1, Math.floor((z - a) / (settings.cues === "few" ? 15 * 60 : 7 * 60)));
   const pool = ["c1","c2","c3","c4","c5","c6","c7","c8","c9"];
-  for(let k=1;k<=n;k++){
-    const idx = n === 1 ? 0 : Math.min(pool.length-1, Math.round((k-1)*(pool.length-1)/(n-1)));
-    add(bodyStart + k*(bodyEnd-bodyStart)/(n+1) + (Math.random()*40-20), "say", pool[idx]);
-  }
-  const r0 = L*0.82;
-  add(r0, "bellSoft");
-  ["r1","r2","r3","r4"].forEach((c,i) => add(r0 + 15 + i*(L*0.14/4), "say", c));
-  add(L, "finish");
-  return ev.sort((a,b) => a.t - b.t);
+  for(let k = 1; k <= n; k++){ const idx = n === 1 ? 0 : Math.round((k - 1) * (pool.length - 1) / (n - 1)); add(a + k * (z - a) / (n + 1), pool[idx]); }
+  const r0 = L * 0.82; ["r1","r2","r3","r4"].forEach((c, i) => add(r0 + i * (L * 0.14 / 4), c));
+  add(L, "FINISH");
+  return ev.sort((x, y) => x.t - y.t);
 }
-function runEvent(ev){
-  if(ev.k === "bell") audio.bell();
-  else if(ev.k === "bellSoft") audio.bell(0.4);
-  else if(ev.k === "say") state.voiceQ = (state.voiceQ || Promise.resolve()).then(() => audio.play(ev.n));
-  else if(ev.k === "finish") finish();
-}
+let vq = Promise.resolve();
 function startJourney(resume){
-  state.phase = "journey";
-  if(resume){ state.events = resume.events; state.j0 = audio.ctx.currentTime - resume.elapsed; }
-  else { state.events = buildEvents(); state.j0 = audio.ctx.currentTime; }
-  clearInterval(state.timer); state.timer = setInterval(tick, 500);
+  kap.phase = "journey"; setPhase("");
+  if(resume){ kap.events = resume.events; kap.j0 = audio.ctx.currentTime - resume.elapsed; } else { kap.events = buildEvents(); kap.j0 = audio.ctx.currentTime; }
+  clearInterval(kap.timer); let last = 0;
+  kap.timer = setInterval(() => {
+    if(kap.phase !== "journey") return;
+    const e = audio.ctx.currentTime - kap.j0;
+    for(const ev of kap.events) if(!ev.done && e >= ev.t){ ev.done = true; if(ev.n === "FINISH") finish(); else vq = vq.then(() => audio.play(ev.n)); }
+    if(e - last > 15){ last = e; saveProgress(); }
+  }, 500);
   saveProgress();
-}
-function tick(){
-  if(state.phase !== "journey") return;
-  const e = audio.ctx.currentTime - state.j0;   // audio clock: stops while paused
-  for(const ev of state.events) if(!ev.done && e >= ev.t){ ev.done = true; runEvent(ev); }
 }
 async function finish(){
-  state.phase = "closing"; clearInterval(state.timer);
-  const run = state.run;
-  await (state.voiceQ || Promise.resolve());
-  if(settings.end === "rest"){
-    await audio.play("endRest");
-    audio.fadeMusic(240); await wait(242); if(state.run===run){ audio.stopMusic(); state.phase = "done"; clearProgress(); }
-  } else {
-    audio.bell(0.35); await wait(4);
-    await audio.play("endReturn");
-    audio.fadeMusic(60); await wait(10);
-    if(state.run===run && state.phase==="closing") endToAfter();
-  }
+  kap.phase = "closing"; clearInterval(kap.timer); clearProgress();
+  await vq; await wait(3);
+  if(settings.end === "rest"){ await audio.play("endRest"); audio.stopBed(120); }
+  else { await audio.play("endReturn"); audio.stopBed(40); caption("Welcome back. Take all the time you need."); }
+  kap.phase = "done"; await wait(settings.end === "rest" ? 120 : 40);
+  if(settings.end === "return"){ await fadeOut($("#kapStage"), 1600); kap.phase = "idle"; go("home"); }
 }
-function endToAfter(){
-  clearProgress(); state.breath = null; try{ audio.stopScheduled(); }catch(e){}
-  state.phase = "done"; state.run++; clearInterval(state.timer); clearInterval(state.gateNudge);
-  audio.resume(); audio.fadeMusic(3); setTimeout(() => audio.stopMusic(), 3500);
-  try{ state.wake && state.wake.release(); }catch(e){}
-  $("#session").classList.remove("on"); $("#pausedLayer").classList.remove("on"); $("#tapGate").classList.remove("on");
-  show("after");
+function endKap(){
+  kap.run++; kap.phase = "idle"; kap.breath = null; clearInterval(kap.timer); clearInterval(kap.nudge);
+  audio.stopScheduled(); audio.stopVoice(); audio.stopBed(3); caption(""); $("#gate").classList.remove("on","show");
+  fadeOut($("#kapStage"), 1600); go("home");
 }
 
-/* Orb: a very gentle glow. During box breathing the ring grows and shrinks while the glow stays put and brightens/fades.
-   Every value eases slowly toward its target, so nothing ever jumps. */
-(function orbLoop(){
-  const orb = $("#orb"), ring = $("#bRing"), circ = $("#bCircle"), lbl = $("#breathLbl");
-  const R0 = 62, R1 = 140;                       // ring radius at empty / full lungs (px)
-  let sm = 0, cur = { s: 1, o: 0.5, r: R0, ro: 0, lo: 0 };
-  function frame(t){
-    if($("#session").classList.contains("on") && audio.ctx){
-      const tgt = { s: 1, o: 0.5, r: R0, ro: 0, lo: 0 };
-      const B = state.breath, tt = B ? audio.ctx.currentTime - B.t0 : -1;
-      if(B && tt >= 0 && tt < B.cycles * 4 * B.T){
-        const idx = Math.floor(tt / B.T), ph = idx % 4, pr = (tt - idx * B.T) / B.T, e = 0.5 - 0.5 * Math.cos(Math.PI * pr);
-        const f = ph === 0 ? e : ph === 1 ? 1 : ph === 2 ? 1 - e : 0;      // 0 = empty, 1 = full
-        tgt.o = 0.25 + 0.7 * f; tgt.r = R0 + (R1 - R0) * f; tgt.ro = 1; tgt.lo = 1;
-        $("#bWord").textContent = ["Breathe in","Hold","Breathe out","Hold"][ph];
-        $("#bCount").textContent = String(Math.min(B.T, Math.floor(pr * B.T) + 1));
-        // the breath itself is already smooth; follow it closely so the ring stays on the beat
-        cur.r = tgt.r; cur.o += (tgt.o - cur.o) * 0.25;
-      } else {
-        const lv = audio.level();
-        sm += (lv - sm) * (lv > sm ? 0.08 : 0.02);                       // gentle rise, slow fall
-        const breath = 0.5 + 0.5 * Math.sin(t / 1000 * 2 * Math.PI / 12);  // one slow ambient breath every 12 s
-        tgt.s = 0.96 + breath * 0.04 + sm * 0.22;                          // swells softly with her voice
-        tgt.o = 0.32 + breath * 0.08 + sm * 0.55;                          // and clearly brightens when she speaks
-        cur.r += (tgt.r - cur.r) * 0.02; cur.o += (tgt.o - cur.o) * 0.03;
-      }
-      cur.s += (tgt.s - cur.s) * 0.03;
-      cur.ro += (tgt.ro - cur.ro) * 0.02; cur.lo += (tgt.lo - cur.lo) * 0.02;
-      orb.style.transform = `scale(${cur.s.toFixed(4)})`; orb.style.opacity = cur.o.toFixed(3);
-      circ.setAttribute("r", cur.r.toFixed(2)); ring.style.opacity = cur.ro.toFixed(3);
-      lbl.style.opacity = cur.lo.toFixed(3);
+/* orb + breathing ring, eased so nothing jumps */
+(function(){
+  const orb = $("#orb"), ring = $("#bRing"), circ = $("#bCircle"), word = $("#bWord");
+  let sc = 1, op = .35, r = 62, ro = 0, sm = 0, lastWord = "";
+  const ease = x => .5 - .5 * Math.cos(Math.PI * x);
+  function frame(){
+    let tsc, top, tr = 62, tro = 0, w = "";
+    const ctx = audio.ctx, b = kap.breath;
+    if(b && ctx){
+      const e = ctx.currentTime - b.t0;
+      if(e >= 0 && e < b.cycles * 4 * b.T){
+        const ph = Math.floor(e / b.T) % 4, f = (e % b.T) / b.T;
+        const g = ph === 0 ? ease(f) : ph === 1 ? 1 : ph === 2 ? 1 - ease(f) : 0;
+        tr = 62 + 78 * g; tro = 1; tsc = 1; top = .25 + .65 * g;
+        w = ["Breathe in","Hold","Breathe out","Hold"][ph];
+      } else { tsc = 1; top = .3; tro = e < 0 ? 1 : 0; }
+    } else {
+      const lvl = Math.min(1, audio.level() * 9); sm += (lvl - sm) * (lvl > sm ? 0.06 : 0.02);
+      const breathe = .5 + .5 * Math.sin(performance.now() / 1000 * 2 * Math.PI / 9);
+      tsc = .95 + breathe * .04 + sm * .14; top = .3 + breathe * .07 + sm * .4;
     }
+    sc += (tsc - sc) * .05; op += (top - op) * .05; r += (tr - r) * .12; ro += (tro - ro) * .03;
+    orb.style.transform = `scale(${sc.toFixed(4)})`; orb.style.opacity = op.toFixed(3);
+    circ.setAttribute("r", r.toFixed(2)); ring.style.opacity = ro.toFixed(3);
+    if(w !== lastWord){ lastWord = w; word.style.opacity = 0; if(w) setTimeout(() => { word.textContent = w; word.style.opacity = .85; }, 500); }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 })();
 
-/* ---------- Press-and-hold to pause (prevents accidental taps) ---------- */
-let holdTimer = null, holdStart = 0, holdRaf = 0;
-const HOLD_MS = 1800;
-function holdBegin(e){
-  if(state.phase==="gate" || state.phase==="idle" || state.phase==="done" || state.paused) return;
-  if(e.target.closest("#pausedLayer") || e.target.closest("#sndSheet") || e.target.closest("#sndBtn")) return;
-  holdStart = performance.now(); $("#ring").style.opacity = 1;
-  const c = $("#ringC");
-  const step = () => {
-    const p = Math.min(1, (performance.now()-holdStart)/HOLD_MS);
-    c.style.strokeDashoffset = 440*(1-p);
-    if(p >= 1){ holdEnd(); doPause(); return; }
-    holdRaf = requestAnimationFrame(step);
-  };
-  holdRaf = requestAnimationFrame(step);
+/* ---------------- break (works for both sessions) ---------------- */
+let paused = false, breakFrom = null;
+function openBreak(from){
+  breakFrom = from; paused = true;
+  if(from === "kap") audio.pause(); else { blsCancel(true); audio.pause(); }
+  $("#ground").style.display = "none"; fadeIn($("#break"));
 }
-function holdEnd(){ cancelAnimationFrame(holdRaf); $("#ring").style.opacity = 0; $("#ringC").style.strokeDashoffset = 440; }
-const sess = $("#session");
-sess.addEventListener("pointerdown", holdBegin);
-["pointerup","pointercancel","pointerleave"].forEach(ev => sess.addEventListener(ev, holdEnd));
-sess.addEventListener("contextmenu", e => e.preventDefault());
-
-function doPause(){
-  if(state.paused) return;
-  state.paused = true; audio.pause();
-  syncPanels();
-  const sel = $("#pVoiceSel"), favs = FAVORITES.map(id => VOICES.find(v => v.id === id)).filter(Boolean), others = VOICES.filter(v => !FAVORITES.includes(v.id));
-  sel.innerHTML = `<optgroup label="Favorites">${favs.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</optgroup><optgroup label="Other voices">${others.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</optgroup>`;
-  sel.value = voiceId; $("#pVoiceMsg").textContent = "";
-  $("#pausedLayer").classList.add("on");
-}
-$("#pVoiceSel").addEventListener("change", async e => {
-  const id = e.target.value, msg = $("#pVoiceMsg"), btn = $("#resumeBtn");
-  msg.textContent = "Loading voice…"; btn.disabled = true;
-  try{ await audio.decodeVoice(id); voiceId = id; store.set("kap_voice13", id); renderVoices(); msg.textContent = "Voice changed. It will be used from here on."; }
-  catch(err){ msg.textContent = "Couldn’t load that voice. Staying with the current one."; e.target.value = voiceId; }
-  btn.disabled = false;
+async function closeBreak(){ paused = false; audio.resume(); await fadeOut($("#break")); if(breakFrom === "kap") wakeLock(); }
+$("#kapBreak").addEventListener("click", e => { e.stopPropagation(); openBreak("kap"); });
+$("#kapSound").addEventListener("click", e => { e.stopPropagation(); openSound(); });
+$("#emdrBreakBtn").addEventListener("click", () => openBreak("emdr"));
+$("#blsBreak").addEventListener("click", () => openBreak("emdr"));
+$("#breakResume").addEventListener("click", closeBreak);
+$("#breakGround").addEventListener("click", () => { $("#ground").style.display = "block"; });
+$("#breakSound").addEventListener("click", () => { openSound(); $("#voiceSelMsg").textContent = "You'll hear any changes when you continue."; });
+$("#breakEnd").addEventListener("click", async () => {
+  paused = false; audio.resume(); await fadeOut($("#break"));
+  if(breakFrom === "kap") endKap(); else { E.step = "close"; E.incomplete = true; renderE(); }
 });
-$("#sndBtn").addEventListener("click", e => { e.stopPropagation();
-  syncPanels(); $("#sndSheet").classList.add("on"); });
-$("#sndClose").addEventListener("click", e => { e.stopPropagation(); $("#sndSheet").classList.remove("on"); });
-$("#resumeBtn").addEventListener("click", () => {
-  $("#pausedLayer").classList.remove("on");
-  state.paused = false; audio.resume(); requestWake();
-});
-$("#endBtn").addEventListener("click", () => { state.paused=false; endToAfter(); });
 
-/* ---------- After ---------- */
-$("#copyBtn").addEventListener("click", async () => {
-  const txt = `Session notes, ${new Date().toLocaleString()}\nIntention: ${$("#intention").value}\n\n${$("#journal").value}`;
-  try{ await navigator.clipboard.writeText(txt); $("#copyBtn").textContent = "Copied"; }
-  catch(e){ $("#journal").select(); $("#copyBtn").textContent = "Select-all done. Use Copy"; }
-  setTimeout(()=> $("#copyBtn").textContent = "Copy notes", 2500);
-});
-$("#againBtn").addEventListener("click", () => { state.phase="idle"; show("prep"); window.scrollTo(0,0); });
-
-/* ---------- Save & resume ---------- */
-const SAVE_KEY = "kap_session_v2";
-function saveProgress(){
-  if(!["prep","gate","journey","closing"].includes(state.phase)) return;
-  const s = { phase: state.phase, voice: voiceId, len: settings.len, cues: settings.cues, end: settings.end,
-    prepIndex: state.prepIndex || 0,
-    elapsed: state.phase === "journey" && audio.ctx ? audio.ctx.currentTime - state.j0 : 0,
-    events: state.phase === "journey" ? state.events : [], savedAt: Date.now() };
-  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(s)); }catch(e){}
+/* ---------------- EMDR ---------------- */
+const NC = ["I'm not safe","I'm not good enough","It was my fault","I'm powerless","I can't trust myself","I'm not in control","I should have done something","I'm unlovable"];
+const PC = ["I'm safe now","I'm good enough","I did the best I could","I have choices now","I can trust myself","I can handle this","I'm learning and growing","I'm worthy of love"];
+const EMO = ["Sad","Afraid","Angry","Ashamed","Guilty","Anxious","Helpless","Lonely","Numb"];
+const BODY = ["Head","Throat","Chest","Stomach","Shoulders","Hands","Legs","All over","Not sure"];
+const calm = (() => { try{ return JSON.parse(store.get("steady-calm")) || {}; }catch(e){ return {}; } })();
+const E = { step:"welcome", t:{ what:"", image:"", nc:"", pc:"", voc:0, emo:[], sud:-1, body:[] }, sets:0, suds:[], incomplete:false, tones: store.get("g_tones") !== "off", speed: store.get("g_speed") || "gentle" };
+function emdrStart(){ if(E.step === "done" || !E.started){ Object.assign(E, { step:"welcome", t:{ what:"", image:"", nc:"", pc:"", voc:0, emo:[], sud:-1, body:[] }, sets:0, suds:[], incomplete:false, started:true }); } renderE(); }
+function scale(id, min, max, val){ return `<div class="scale" id="${id}" style="grid-template-columns:repeat(${max - min + 1},1fr)">${Array.from({ length:max - min + 1 }, (_, k) => `<button data-v="${min + k}" class="${val === min + k ? "sel" : ""}">${min + k}</button>`).join("")}</div>`; }
+function onScale(id, ...a){ const f = a[a.length - 1]; const el = $("#" + id); el.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; el.querySelectorAll("button").forEach(x => x.classList.toggle("sel", x === b)); f(+b.dataset.v); }); }
+function chipsHTML(id, list, sel){ return `<div class="chips" id="${id}">${list.map(x => `<button class="chip${sel.includes(x) ? " sel" : ""}">${esc(x)}</button>`).join("")}</div>`; }
+const V = $("#emdrView");
+function renderE(){
+  V.style.transition = "opacity .6s ease"; V.style.opacity = 0;
+  setTimeout(() => { V.innerHTML = STEPS[E.step](); V.style.opacity = 1; window.scrollTo(0, 0); (HOOKS[E.step] || (() => {}))(); }, 600);
 }
-function clearProgress(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
-function loadProgress(){
-  try{ const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if(s && Date.now() - s.savedAt < 8*3600e3) return s; }catch(e){}
-  return null;
+function to(step){ E.step = step; renderE(); }
+const STEPS = {
+  welcome: () => `<button class="back" data-go="home">← Home</button>
+    <h1>Welcome. We'll go slowly.</h1>
+    <p>This guide walks you through an EMDR-style session one small step at a time. You'll follow a soft light from side to side while you notice what comes up.</p>
+    <div class="card warm"><p><b>Is this right for today?</b></p>
+      <p class="dim" style="margin-bottom:8px">It's meant for <b>mild, everyday</b> upsets: a stressful moment, an awkward memory, a worry. Bigger trauma deserves a trained EMDR therapist.</p>
+      <p class="dim" style="margin:0">Please don't use it during or soon after a ketamine session, or under the influence of anything, unless your clinician is guiding you.</p></div>
+    <p class="dim small">Plan on 30 to 45 minutes somewhere private. Headphones help if you use the soft tones. You can take a break any time with the button in the corner.</p>
+    <button class="btn" onclick="to('check')">Let's begin</button>`,
+  check: () => `<h1>A quick check-in</h1><p class="dim">Tick what's true for you right now.</p>
+    <label class="check"><input type="checkbox" class="sc"> I'm not in crisis, and I'm not having thoughts of harming myself.</label>
+    <label class="check"><input type="checkbox" class="sc"> What I'll work on is mild to moderate, not a major trauma.</label>
+    <label class="check"><input type="checkbox" class="sc"> I'm not under the influence of alcohol or drugs, including ketamine.</label>
+    <label class="check"><input type="checkbox" class="sc"> Moving lights don't trigger seizures for me, and I'm not prone to dissociating (or my clinician has okayed this).</label>
+    <p class="dim small" style="margin-top:14px">If any of these aren't true today, it's kind to yourself to wait, or to work with a therapist. That's a good choice, not a failure.</p>
+    <button class="btn" id="checkGo" disabled>Continue</button><button class="btn quiet" onclick="to('welcome')">Back</button>`,
+  settle: () => `<h1>Settle in</h1><p>Sit somewhere comfortable with your feet on the floor. Let's take a few slow breaths together.</p>
+    <div id="ebreath"></div><div id="ebreathWord"></div>
+    <button class="btn" id="breatheGo">Breathe with me (1 minute)</button><button class="btn quiet" onclick="to('calm')">Skip</button>`,
+  calm: () => `<h1>Your calm place</h1><p>Bring to mind a place, real or imagined, where you feel safe and at ease. A beach, a forest, a cozy room, someone's kitchen.</p>
+    <p>Picture it for a moment: what you'd see, hear, smell and feel there.</p>
+    <details${calm.place || calm.word ? " open" : ""}><summary>Write it down so I remember it (optional)</summary>
+      <p class="dim small" style="margin:6px 0">What's it like there?</p><input type="text" id="cPlace" value="${esc(calm.place)}" placeholder="Warm sand, slow waves">
+      <p class="dim small" style="margin:12px 0 6px">A word that brings you back there</p><input type="text" id="cWord" value="${esc(calm.word)}" placeholder="Shore">
+      <p class="dim small" style="margin-top:8px">Saved only on this device.</p></details>
+    <button class="btn" onclick="saveCalm();to('calmSet')">I have it in mind</button>`,
+  calmSet: () => `<h1>Let it grow a little stronger</h1><p>Picture your calm place${calm.word ? ` and say <b>“${esc(calm.word)}”</b> to yourself` : ""}. Follow the light with just your eyes. This is a short, slow set.</p>
+    <div id="after"></div><button class="btn" id="setGo">Start a short set</button>`,
+  target: () => `<h1>What would you like to work on?</h1><p>Choose something <b>mild</b>, something that bothers you about a 3 to 6 out of 10.</p>
+    <p class="dim small" style="margin:14px 0 6px">A few words about it</p><input type="text" id="tWhat" value="${esc(E.t.what)}" placeholder="The meeting on Tuesday">
+    <p class="dim small" style="margin:14px 0 6px">The picture that stands for the hardest part of it (optional)</p><input type="text" id="tImg" value="${esc(E.t.image)}" placeholder="Their face when I spoke">
+    <button class="btn" id="tGo"${E.t.what ? "" : " disabled"}>Continue</button><button class="btn quiet" onclick="to('calm')">Back</button>`,
+  beliefs: () => `<h1>What does it say about you?</h1>
+    <p class="dim">When you think of it, what unkind belief about yourself comes with it?</p>${chipsHTML("nc", NC, [E.t.nc])}<input type="text" id="ncT" placeholder="Or in your own words" value="${NC.includes(E.t.nc) ? "" : esc(E.t.nc)}">
+    <p class="dim" style="margin-top:22px">What would you rather believe about yourself?</p>${chipsHTML("pc", PC, [E.t.pc])}<input type="text" id="pcT" placeholder="Or in your own words" value="${PC.includes(E.t.pc) ? "" : esc(E.t.pc)}">
+    <button class="btn" id="bGo" disabled>Continue</button><button class="btn quiet" onclick="to('target')">Back</button>`,
+  baseline: () => `<h1>Where you're starting from</h1>
+    <p class="dim">Thinking of it now, how true does <b>“${esc(E.t.pc)}”</b> feel? <span class="small">(1 = not at all, 7 = completely)</span></p>${scale("voc", 1, 7, E.t.voc)}
+    <p class="dim" style="margin-top:20px">What feelings come up?</p>${chipsHTML("emo", EMO, E.t.emo)}
+    <p class="dim" style="margin-top:20px">How upsetting does it feel right now? <span class="small">(0 = calm, 10 = the most)</span></p>${scale("sud", 0, 10, E.t.sud)}
+    <p class="dim" style="margin-top:20px">Where do you notice it in your body?</p>${chipsHTML("body", BODY, E.t.body)}
+    <div class="card warm" id="hi" style="display:none">That's a big number. For something this upsetting, it's safer with a therapist beside you. You could pick something milder today.<button class="btn soft" onclick="to('target')">Choose something milder</button></div>
+    <button class="btn" id="baseGo" disabled>Begin</button>`,
+  process: () => `<h1>${E.sets === 0 ? "Bring it to mind" : "Go with that"}</h1>
+    ${E.sets === 0 ? `<p>Bring up the picture, the thought <b>“${esc(E.t.nc)}”</b>, and where you feel it in your body. Then follow the light.</p>` : `<p>Notice whatever came up, and let it be there as you follow the light. Nothing needs forcing.</p>`}
+    <p class="dim">Like watching scenery from a train window: it passes by. You're safe here, right now.</p>
+    <div id="after"></div>
+    <button class="btn" id="setGo">Start the light</button>
+    <details style="margin-top:14px"><summary>Light and tone settings</summary>
+      <p class="dim small" style="margin:6px 0">Speed</p><div class="toggle" id="spd"><button data-v="gentle">Gentle</button><button data-v="steady">Steady</button></div>
+      <p class="dim small" style="margin:14px 0 6px">Soft side-to-side tones</p><div class="toggle" id="tns"><button data-v="on">On</button><button data-v="off">Off</button></div></details>`,
+  install: () => `<h1>Strengthen the kinder belief</h1>
+    <p>Does <b>“${esc(E.t.pc)}”</b> still fit? You can change the words.</p><input type="text" id="pcEdit" value="${esc(E.t.pc)}">
+    <p style="margin-top:14px">Hold the memory together with these words, and follow the light.</p>
+    <div id="after"></div><button class="btn" id="setGo">Start the light</button>`,
+  body: () => `<h1>Check in with your body</h1>
+    <p>Close your eyes for a moment. Hold the memory and the words <b>“${esc(E.t.pc)}”</b>. Slowly notice your body from head to toe.</p>
+    <p class="dim">Is there any tightness or unusual feeling?</p>
+    <button class="btn soft" onclick="to('close')">It feels clear</button>
+    <button class="btn soft" id="bodySet">Something's there</button><div id="after"></div>`,
+  close: () => `<h1>Closing gently</h1>
+    ${E.incomplete ? `<p>You stopped before it felt fully settled, and that's completely okay. Your mind keeps working on its own, and you can return another day.</p>` : ""}
+    <div class="card"><p><b>A safe container</b></p><p class="dim" style="margin:0">Imagine a strong container: a chest, a vault, a sealed box. Place anything left over from today inside it. Close the lid. It will wait there until you choose to open it.</p></div>
+    <div class="card"><p><b>Back to your calm place</b></p><p class="dim" style="margin:0">Bring it to mind${calm.place ? `: ${esc(calm.place)}` : ""}.${calm.word ? ` Say <b>“${esc(calm.word)}”</b> to yourself.` : ""} Breathe there for a little while.</p></div>
+    <div id="ebreath"></div><div id="ebreathWord"></div>
+    <button class="btn soft" id="breatheGo">Breathe with me (30 seconds)</button>
+    <button class="btn" onclick="to('done')">Finish</button>`,
+  done: () => {
+    const a = E.suds[0], z = E.suds[E.suds.length - 1];
+    return `<h1>Well done. Truly.</h1>
+    ${E.suds.length ? `<div class="card"><p style="margin:0">How upsetting it felt: <b>${a}</b> at the start, <b>${z}</b> at the end.</p>${E.t.voc ? `<p class="dim small" style="margin:6px 0 0">How true “${esc(E.t.pc)}” felt: ${E.t.voc} out of 7.</p>` : ""}</div>` : ""}
+    <p>Over the next day or so, thoughts, dreams or feelings may surface. That's normal. Notice them kindly, and write them down if it helps.</p>
+    <p class="dim">Drink some water, move a little, and be gentle with yourself. If anything feels like too much, reach out to someone you trust or a therapist.</p>
+    <button class="btn" onclick="E.started=false;go('home')">Back home</button>`; },
+};
+const HOOKS = {
+  check(){ const cs = [...document.querySelectorAll(".sc")]; cs.forEach(c => c.addEventListener("change", () => $("#checkGo").disabled = !cs.every(x => x.checked))); $("#checkGo").onclick = () => to("settle"); },
+  settle(){ $("#breatheGo").onclick = () => guidedBreath(60, () => to("calm")); },
+  calmSet(){ $("#setGo").onclick = () => runSet(12, "Picture your calm place.", () => {
+    $("#after").innerHTML = `<div class="card"><p style="margin:0">How was that?</p></div><button class="btn" onclick="to('target')">That felt good. Continue</button><button class="btn soft" onclick="to('calm')">It didn't feel calm. Try another place</button>`; $("#setGo").style.display = "none"; }); },
+  target(){ const w = $("#tWhat"), g = $("#tGo"); w.addEventListener("input", () => g.disabled = !w.value.trim()); g.onclick = () => { E.t.what = w.value.trim(); E.t.image = $("#tImg").value.trim(); to("beliefs"); }; },
+  beliefs(){
+    const upd = () => { $("#bGo").disabled = !(E.t.nc && E.t.pc); };
+    [["nc","ncT"],["pc","pcT"]].forEach(([k, tId]) => {
+      const row = $("#" + k), t = $("#" + tId);
+      row.addEventListener("click", e => { const b = e.target.closest(".chip"); if(!b) return; E.t[k] = b.textContent; t.value = ""; row.querySelectorAll(".chip").forEach(x => x.classList.toggle("sel", x === b)); upd(); });
+      t.addEventListener("input", () => { E.t[k] = t.value.trim(); row.querySelectorAll(".chip").forEach(x => x.classList.remove("sel")); upd(); });
+    }); upd(); $("#bGo").onclick = () => to("baseline");
+  },
+  baseline(){
+    const upd = () => { $("#baseGo").disabled = !(E.t.voc && E.t.sud >= 0) || E.t.sud >= 8; $("#hi").style.display = E.t.sud >= 8 ? "block" : "none"; };
+    onScale("voc", 1, v => { E.t.voc = v; upd(); }); onScale("sud", 0, v => { E.t.sud = v; upd(); });
+    ["emo","body"].forEach(k => $("#" + k).addEventListener("click", e => { const b = e.target.closest(".chip"); if(!b) return; const x = b.textContent, arr = E.t[k]; const i = arr.indexOf(x); if(i < 0) arr.push(x); else arr.splice(i, 1); b.classList.toggle("sel", i < 0); }));
+    upd(); $("#baseGo").onclick = () => { E.suds = [E.t.sud]; E.sets = 0; E.vocStart = E.t.voc; to("process"); };
+  },
+  process(){
+    const tg = (id, key, val) => { const el = $("#" + id); el.querySelectorAll("button").forEach(b => b.classList.toggle("sel", b.dataset.v === val)); el.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; el.querySelectorAll("button").forEach(x => x.classList.toggle("sel", x === b)); key(b.dataset.v); }); };
+    tg("spd", v => { E.speed = v; store.set("g_speed", v); }, E.speed);
+    tg("tns", v => { E.tones = v === "on"; store.set("g_tones", v); }, E.tones ? "on" : "off");
+    $("#setGo").onclick = () => runSet(24, "", afterProcessSet);
+  },
+  install(){ $("#setGo").onclick = () => { E.t.pc = $("#pcEdit").value.trim() || E.t.pc; runSet(12, "", () => {
+    $("#after").innerHTML = `<p class="dim" style="margin-top:16px">How true does <b>“${esc(E.t.pc)}”</b> feel now?</p>${scale("voc2", 1, 7, 0)}<button class="btn" id="iGo" disabled>Continue</button><button class="btn soft" id="iMore">Another set to strengthen it</button>`;
+    $("#setGo").style.display = "none"; onScale("voc2", 1, v => { E.t.voc = v; $("#iGo").disabled = false; });
+    $("#iGo").onclick = () => to("body"); $("#iMore").onclick = () => renderE(); }); }; },
+  body(){ $("#bodySet").onclick = () => { $("#after").innerHTML = `<p class="dim" style="margin-top:12px">Just notice that feeling, and follow the light.</p>`; runSet(24, "", () => { $("#after").innerHTML = `<button class="btn" onclick="to('close')">Continue to closing</button>`; }); }; },
+  close(){ $("#breatheGo").onclick = () => guidedBreath(30, () => {}); },
+};
+function saveCalm(){ const p = $("#cPlace"), w = $("#cWord"); if(p){ calm.place = p.value.trim(); calm.word = w.value.trim(); store.set("steady-calm", JSON.stringify(calm)); } }
+function afterProcessSet(){
+  E.sets++;
+  $("#after").innerHTML = `<div class="card"><p style="margin:0 0 4px"><b>Take a deep breath, and let it go.</b></p><p class="dim" style="margin:0">What do you notice now? A picture, a thought, a feeling, anything at all. No need to judge it.</p></div>
+    <p class="dim" style="margin-top:16px">How upsetting does the original memory feel now?</p>${scale("sud2", 0, 10, -1)}
+    <div class="card warm" id="rise" style="display:none">It's gone up a bit. That can happen, and it's okay to stop here. You could take a break, or close gently for today.<button class="btn soft" onclick="openBreak('emdr')">Take a break</button></div>
+    <button class="btn" id="again" disabled>Another set</button>
+    <button class="btn soft" id="neutral" style="display:none">It feels calm now. Move on</button>
+    <button class="btn quiet" id="stopToday">Close gently for today</button>`;
+  $("#setGo").style.display = "none";
+  E.lastSud = -1;
+  const keep = () => { if(E.lastSud >= 0) E.suds.push(E.lastSud); };
+  onScale("sud2", 0, v => {
+    E.lastSud = v; $("#again").disabled = false; $("#neutral").style.display = v <= 1 ? "block" : "none";
+    $("#rise").style.display = v >= E.suds[0] + 2 ? "block" : "none";
+  });
+  $("#again").onclick = () => { keep(); renderE(); };
+  $("#neutral").onclick = () => { keep(); to("install"); };
+  $("#stopToday").onclick = () => { keep(); E.incomplete = true; to("close"); };
+  if(E.sets >= 10){ $("#after").insertAdjacentHTML("afterbegin", `<div class="card warm">You've done a lot of sets. It may be a good moment to close gently for today.</div>`); }
 }
-setInterval(saveProgress, 3000);
-document.addEventListener("visibilitychange", () => { if(document.visibilityState === "hidden") saveProgress(); });
-window.addEventListener("pagehide", saveProgress);
-
-const savedSession = loadProgress();
-if(savedSession){
-  const s = savedSession;
-  const mins = Math.max(0, Math.round((Date.now() - s.savedAt)/60000));
-  const ago = mins < 1 ? "just now" : mins === 1 ? "1 minute ago" : mins < 60 ? `${mins} minutes ago` : `${Math.round(mins/60)} hours ago`;
-  const where = s.phase === "journey" ? `${Math.floor(s.elapsed/60)} of ${s.len} minutes into the journey`
-    : s.phase === "gate" ? "waiting for you to take your medicine"
-    : s.phase === "closing" ? "at the ending" : "while settling in";
-  $("#resumeWhere").textContent = `Stopped ${where}, ${ago}.`;
-  $("#resumeCard").style.display = "block";
+/* guided breathing (4 in, 4 hold, 6 out) */
+function guidedBreath(sec, done){
+  const g = $("#ebreath"), w = $("#ebreathWord"); let t = 0, alive = true; const btn = $("#breatheGo"); if(btn) btn.disabled = true;
+  const seq = [["Breathe in", 4, 1.05, .95], ["Hold", 4, 1.05, .95], ["Breathe out", 6, .7, .45]];
+  (async () => { while(alive && t < sec){ for(const [word, d, s, o] of seq){ if(!document.body.contains(g)){ alive = false; break; } w.textContent = word; g.style.transitionDuration = d + "s"; g.style.transform = `scale(${s})`; g.style.opacity = o; await wait(d); t += d; } }
+    w.textContent = alive ? "Well done." : ""; if(btn) btn.disabled = false; if(alive) setTimeout(done, 1500); })();
 }
-$("#resumeSessionBtn").addEventListener("click", async () => {
-  const s = savedSession; if(!s) return;
-  const b = $("#resumeSessionBtn"); b.disabled = true; b.textContent = "Loading…";
-  try{ preview.pause(); }catch(e){}
-  settings.len = s.len; settings.cues = s.cues; settings.end = s.end;
-  if(VOICES.some(v => v.id === s.voice)) voiceId = s.voice;
-  try{ await audio.unlockAndDecode(); }catch(e){ b.disabled = false; b.textContent = "Couldn’t load audio. Try again"; return; }
-  requestWake();
-  $("#resumeCard").style.display = "none";
-  show("session"); $("#session").classList.add("on");
-  const run = ++state.run;
-  if(s.phase === "prep"){ runPrep(run, s.prepIndex || 0); return; }
-  audio.startMusic(6);
-  if(s.phase === "gate"){ showGate(); }
-  else if(s.phase === "journey"){ await wait(3); audio.bell(); startJourney({ events: s.events, elapsed: s.elapsed }); }
-  else { await wait(3); finish(); }
-});
-$("#freshBtn").addEventListener("click", () => { clearProgress(); $("#resumeCard").style.display = "none"; });
+/* the moving light */
+let blsState = null;
+function runSet(passes, msg, after){
+  const el = $("#bls"), dot = $("#dot"), cnt = $("#blsCount");
+  $("#blsMsg").textContent = msg || "Follow the light with your eyes. Keep your head still.";
+  $("#blsMsg").style.opacity = 1; setTimeout(() => $("#blsMsg").style.opacity = .0, 6000);
+  fadeIn(el); audio.unlock();
+  const per = E.speed === "steady" ? 0.9 : 1.25, total = passes * per;
+  const st = blsState = { alive:true, after, t0:performance.now() + 1500, lastSide:0 };
+  function frame(now){
+    if(!st.alive) return;
+    const e = Math.max(0, (now - st.t0) / 1000), W = window.innerWidth, m = 40;
+    const k = Math.min(e / per, passes), f = k % 1, dir = Math.floor(k) % 2;
+    const x = m + (W - 2 * m) * (dir === 0 ? (.5 - .5 * Math.cos(Math.PI * f)) : (.5 + .5 * Math.cos(Math.PI * f)));
+    dot.style.transform = `translateX(${x}px)`;
+    const side = Math.floor(k); if(side !== st.lastSide && e > 0){ st.lastSide = side; if(E.tones) audio.tone(side % 2 ? 0.8 : -0.8); }
+    cnt.textContent = e > 0 ? "" : "";
+    if(e >= total){ st.alive = false; fadeOut(el).then(() => after && after()); return; }
+    requestAnimationFrame(frame);
+  }
+  dot.style.transform = `translateX(40px)`; requestAnimationFrame(frame);
+}
+function blsCancel(silent){ if(blsState && blsState.alive){ blsState.alive = false; fadeOut($("#bls")); if(!silent && blsState.after) blsState.after(); } }
+$("#blsStop").addEventListener("click", () => blsCancel(false));
 
-// Gentle switch between KAP and EMDR: fade out, then load the other page (which fades in)
-document.querySelectorAll(".modes a").forEach(a => a.addEventListener("click", e => {
-  if(a.classList.contains("on")) { e.preventDefault(); return; }
-  e.preventDefault(); document.body.classList.add("leaving");
-  setTimeout(() => { location.href = a.getAttribute("href"); }, 900);
-}));
-
-// Debug hook for testing: ?fast is not passed through artifacts, so expose on window
-window.__kap = { state, settings, audio, boxBreathing };
-})();
+/* ---------------- start ---------------- */
+$("#helloTitle").textContent = (h => h < 5 ? "Hi. It's late, and you're safe here." : h < 12 ? "Good morning. You're in a safe place." : h < 18 ? "Hi. You're in a safe place." : "Good evening. You're in a safe place.")(new Date().getHours());
+go("home");
+window.__g = { audio, kap, settings, E };
 </script>
-<!-- ===== Disclaimer gate (shared by KAP and EMDR pages) ===== -->
-<style>
-  #discGate{position:absolute;top:0;left:0;right:0;min-height:100%;z-index:9999;background:#08070e;display:none;padding:calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 30px);animation:dgIn 1.2s ease both;font:15.5px/1.55 ui-sans-serif,-apple-system,system-ui,sans-serif;color:#e6e1d8}
-  #discGate.on{display:block}
-  body.gated > *:not(#discGate):not(script):not(style){display:none!important}
-  @keyframes dgIn{from{opacity:0}to{opacity:1}}
-  #discGate .wrap{max-width:540px;margin:0 auto}
-  #discGate .tag{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#e39a7f;border:1px solid #e39a7f;border-radius:999px;padding:4px 10px}
-  #discGate h1{font:400 27px/1.2 ui-serif,Georgia,serif;margin:14px 0 10px;color:#f1e7da}
-  #discGate .big{font-size:17px;color:#f3d9c5;margin:0 0 14px}
-  #discGate ul{padding-left:20px;margin:0 0 16px}
-  #discGate li{margin:8px 0;color:#d8d2c8}
-  #discGate li b{color:#f1e7da}
-  #discGate .crisis{border:1.5px solid #e39a7f;background:rgba(227,154,127,.10);border-radius:14px;padding:12px 14px;margin:14px 0;color:#f3d9c5}
-  #discGate label{display:flex;gap:12px;align-items:flex-start;margin:12px 0;cursor:pointer;color:#e6e1d8}
-  #discGate input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:#e0b48a}
-  #discGate button{display:block;width:100%;margin-top:16px;padding:16px;border:0;border-radius:14px;background:#e0b48a;color:#1a1209;font:600 16px ui-sans-serif,system-ui,sans-serif}
-  #discGate button:disabled{opacity:.35}
-  #discGate a{color:#e0b48a}
-  .discBanner{display:block;margin:0 0 16px;padding:11px 14px;border:1.5px solid #e39a7f;border-radius:12px;background:rgba(227,154,127,.10);color:#f3d9c5;font:14px/1.45 ui-sans-serif,system-ui,sans-serif;text-decoration:none}
-  .discBanner b{color:#f7e3d3}
-  .discFoot{display:block;text-align:center;margin:26px 0 8px;color:#9a94a6;font:13px ui-sans-serif,system-ui,sans-serif}
-  .discFoot a{color:#e0b48a}
-</style>
-<div id="discGate" role="dialog" aria-modal="true" aria-labelledby="dgTitle">
-  <div class="wrap">
-    <span class="tag">Please read before using</span>
-    <h1 id="dgTitle">This is a personal project, not medical care</h1>
-    <p class="big">I made this for my own use and am sharing it with friends for feedback. It is <b>not medical advice, not therapy, not treatment</b>, and <b>not a medical device</b>.</p>
-    <ul>
-      <li><b>Not reviewed by any doctor, therapist or clinician.</b> Not affiliated with any clinic or provider.</li>
-      <li><b>No dosing or medication guidance.</b> Take ketamine only exactly as prescribed, under your care team's supervision, with a monitor present if they require one.</li>
-      <li><b>Not a substitute for professional care.</b> EMDR should be done with a trained, licensed clinician. Don't use the EMDR section for trauma or under the influence of any substance, including ketamine.</li>
-      <li><b>It does not monitor you</b> and cannot call for help.</li>
-      <li><b>The voices are AI-generated</b>, not real people.</li>
-      <li><b>Use entirely at your own risk.</b> Provided "as is", with no warranty of any kind. Adults 18+ only.</li>
-    </ul>
-    <div class="crisis"><b>In crisis or thinking about harming yourself?</b> Call or text <b>988</b> (US Suicide &amp; Crisis Lifeline). In an emergency, call <b>911</b>.</div>
-    <label><input type="checkbox" class="dgc"> I understand this is not medical advice, therapy or treatment, and I use it at my own risk.</label>
-    <label><input type="checkbox" class="dgc"> I am 18 or older.</label>
-    <p style="margin:10px 0 0"><a href="disclaimer.html">Read the full disclaimer</a></p>
-    <button id="dgGo" disabled>I understand, continue</button>
-  </div>
-</div>
-<script>
-(function(){
-  const KEY = "app_disclaimer_ack_v1", DAYS = 30;
-  let ok = false; try{ const t = +localStorage.getItem(KEY); ok = t && (Date.now() - t) < DAYS*864e5; }catch(e){}
-  const g = document.getElementById("discGate");
-  if(!ok){ g.classList.add("on"); document.body.classList.add("gated"); window.scrollTo(0,0); }
-  const boxes = [...g.querySelectorAll(".dgc")], go = document.getElementById("dgGo");
-  boxes.forEach(b => b.onchange = () => go.disabled = !boxes.every(x => x.checked));
-  go.onclick = () => { try{ localStorage.setItem(KEY, Date.now()); }catch(e){} g.style.transition = "opacity 1s ease"; g.style.opacity = 0;
-    setTimeout(() => { g.classList.remove("on"); g.style.opacity = ""; document.body.classList.remove("gated"); window.scrollTo(0,0); }, 1000); };
-})();
-</script>
-
 </body>
 </html>
