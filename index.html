@@ -79,6 +79,13 @@
   #pausedLayer{position:absolute;inset:0;background:rgba(10,8,20,.93);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px}
   #pausedLayer.on{display:flex;animation:softIn 1.4s ease both}
   #pausedLayer .btn{max-width:320px;margin:0}
+  #sndBtn{position:absolute;right:calc(env(safe-area-inset-right) + 16px);top:calc(env(safe-area-inset-top) + 14px);background:none;border:1px solid #2a2638;color:#6d6680;border-radius:999px;padding:7px 14px;font:13px ui-sans-serif,system-ui,sans-serif;z-index:5}
+  #sndSheet{position:absolute;left:0;right:0;bottom:0;transform:translateY(105%);transition:transform 1s cubic-bezier(.22,.8,.3,1);z-index:6;padding:0 12px calc(env(safe-area-inset-bottom) + 12px)}
+  #sndSheet.on{transform:translateY(0)}
+  .sheetIn{max-width:460px;margin:0 auto;background:rgba(20,17,31,.96);border:1px solid #2a2638;border-radius:20px;padding:16px 18px 10px}
+  .sheetHead{display:flex;justify-content:space-between;align-items:center;font:15px ui-sans-serif,system-ui,sans-serif;color:#e6e1d8}
+  .sheetHead button{background:#2a2333;color:#e0b48a;border:0;border-radius:999px;padding:8px 16px;font:14px ui-sans-serif,system-ui,sans-serif}
+  .sheetNote{color:#6d6680;font:12px ui-sans-serif,system-ui,sans-serif;margin:10px 0 2px;text-align:center}
   .pvol{width:100%;max-width:320px;margin:4px 0 10px;max-height:52vh;overflow:auto}
   .snd label{display:flex;justify-content:space-between;align-items:baseline;color:var(--dim);font:14px ui-sans-serif,system-ui,sans-serif;margin:16px 0 4px}
   .pvsel{width:100%;background:#15131f;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:15px ui-sans-serif,system-ui,sans-serif;padding:10px}
@@ -162,10 +169,10 @@
   <details style="margin-top:22px" open>
     <summary class="muted sans" style="cursor:pointer">Sound</summary>
     <div class="snd" data-prefix="">
-      <label>Voice volume</label><input type="range" id="voiceVol" min="20" max="100" value="90">
+      <label>Voice volume</label><input type="range" id="voiceVol" min="0" max="100" value="80">
       <label>Music volume</label><input type="range" id="musicVol" min="0" max="100" value="55">
       <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" id="voiceTone" min="-100" max="100" value="0">
-      <label>Music tone <span>softer ↔ airier</span></label><input type="range" id="musicTone" min="0" max="100" value="45">
+      <label>Music tone <span>softer ↔ airier</span></label><input type="range" id="musicTone" min="0" max="100" value="50">
       <label>Music dip while the voice speaks <span>none ↔ strong</span></label><input type="range" id="duckAmt" min="0" max="100" value="60">
     </div>
     <button class="btn ghost" id="testBtn" style="margin-top:16px">Test voice and music</button>
@@ -188,12 +195,24 @@
     <div class="big">Tap anywhere<br>once you’ve taken your medicine</div>
     <div class="small">Then lie back. The guide takes it from there.</div>
   </div>
+  <button id="sndBtn" aria-label="Sound settings">Sound</button>
+  <div id="sndSheet">
+    <div class="sheetIn snd">
+      <div class="sheetHead"><b>Sound</b><button id="sndClose">Done</button></div>
+      <label>Voice volume</label><input type="range" data-mirror="voiceVol" min="0" max="100">
+      <label>Music volume</label><input type="range" data-mirror="musicVol" min="0" max="100">
+      <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" data-mirror="voiceTone" min="-100" max="100">
+      <label>Music tone <span>softer ↔ airier</span></label><input type="range" data-mirror="musicTone" min="0" max="100">
+      <label>Music dip <span>none ↔ strong</span></label><input type="range" data-mirror="duckAmt" min="0" max="100">
+      <p class="sheetNote">Changes are instant. The session keeps playing.</p>
+    </div>
+  </div>
   <div id="hold">press and hold to pause</div>
   <div id="pausedLayer">
     <p style="color:#9a968e;text-align:center">Paused. You’re safe. You’re in your bed.</p>
     <div class="pvol snd">
       <label>Voice</label><select id="pVoiceSel" class="pvsel"></select><span id="pVoiceMsg" class="pvmsg"></span>
-      <label>Voice volume</label><input type="range" data-mirror="voiceVol" min="20" max="100">
+      <label>Voice volume</label><input type="range" data-mirror="voiceVol" min="0" max="100">
       <label>Music volume</label><input type="range" data-mirror="musicVol" min="0" max="100">
       <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" data-mirror="voiceTone" min="-100" max="100">
       <label>Music tone <span>softer ↔ airier</span></label><input type="range" data-mirror="musicTone" min="0" max="100">
@@ -278,14 +297,17 @@ const CLIPS = ["test","nudge","prep1","prep2","prep3","prep4","prep5","prep6","o
 let voiceId = store.get("kap_voice13") || "sulafatn";
 if(!VOICES.some(v => v.id === voiceId)) voiceId = "sulafatn";
 const audio = (() => {
-  let ctx, master, music, duck, voice, vLow, vHigh, mLP, analyser, loopSrc = null; const buf = {}; const loads = {}; let lvBuf = null; let speaking = 0; const scheduled = [];
+  let ctx, master, music, duck, voice, vLow, vHigh, mLP, mHS, analyser, loopSrc = null; const buf = {}; const loads = {}; let lvBuf = null; let speaking = 0; const scheduled = [];
   function ensure(){
     if(ctx) return;
     ctx = new (window.AudioContext || window.webkitAudioContext)();
-    master = ctx.createGain(); master.connect(ctx.destination);
+    master = ctx.createGain();
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.003; lim.release.value = 0.25;
+    master.connect(lim); lim.connect(ctx.destination);
     music = ctx.createGain(); music.gain.value = 0;
     duck = ctx.createGain(); mLP = ctx.createBiquadFilter(); mLP.type = "lowpass"; mLP.Q.value = 0.5;
-    music.connect(duck); duck.connect(mLP); mLP.connect(master);
+    mHS = ctx.createBiquadFilter(); mHS.type = "highshelf"; mHS.frequency.value = 2500;
+    music.connect(duck); duck.connect(mLP); mLP.connect(mHS); mHS.connect(master);
     voice = ctx.createGain();
     vLow = ctx.createBiquadFilter(); vLow.type = "lowshelf"; vLow.frequency.value = 220;
     vHigh = ctx.createBiquadFilter(); vHigh.type = "highshelf"; vHigh.frequency.value = 3800;
@@ -297,15 +319,18 @@ const audio = (() => {
   function applyVol(){
     if(!ctx) return;
     const t = ctx.currentTime;
-    voice.gain.setTargetAtTime((+$("#voiceVol").value/100), t, 0.05);
+    voice.gain.setTargetAtTime(dbGain(+$("#voiceVol").value, 85), t, 0.05);      // 85 = original level, 100 = about 2x louder
     const vt = (+$("#voiceTone").value)/100;           // -1 warmer ... +1 clearer
-    vLow.gain.setTargetAtTime(vt < 0 ? -vt*5 : -vt*2.5, t, 0.05);
-    vHigh.gain.setTargetAtTime(vt < 0 ? vt*6 : vt*4.5, t, 0.05);
-    const mt = (+$("#musicTone").value)/100;           // 0 softer ... 1 airier
-    mLP.frequency.setTargetAtTime(700 * Math.pow(16000/700, mt), t, 0.05);
+    vLow.gain.setTargetAtTime(vt < 0 ? -vt*7 : -vt*4, t, 0.05);
+    vHigh.gain.setTargetAtTime(vt < 0 ? vt*9 : vt*7, t, 0.05);
+    const mt = (+$("#musicTone").value)/100;           // 0 softer ... 0.5 neutral ... 1 airier
+    if(mt < 0.5){ mLP.frequency.setTargetAtTime(500 * Math.pow(20000/500, mt*2), t, 0.05); mHS.gain.setTargetAtTime(0, t, 0.05); }
+    else { mLP.frequency.setTargetAtTime(20000, t, 0.05); mHS.gain.setTargetAtTime((mt - 0.5) * 2 * 10, t, 0.05); }
   }
+  // slider 0..100 -> loudness in decibels, so every part of the slider is audible (0 = silent)
+  function dbGain(v, unity){ return v <= 0 ? 0 : Math.pow(10, ((v - unity) * 0.42) / 20); }
   function dipLevel(){ return 1 - 0.85 * (+$("#duckAmt").value/100); }
-  function musicTarget(){ return (+$("#musicVol").value/100) * 0.9; }
+  function musicTarget(){ return dbGain(+$("#musicVol").value, 75) * 0.8; }
   const raw = {};
   async function fetchSet(paths, onProgress){
     let n = 0;
@@ -578,7 +603,7 @@ let holdTimer = null, holdStart = 0, holdRaf = 0;
 const HOLD_MS = 1800;
 function holdBegin(e){
   if(state.phase==="gate" || state.phase==="idle" || state.phase==="done" || state.paused) return;
-  if(e.target.closest("#pausedLayer")) return;
+  if(e.target.closest("#pausedLayer") || e.target.closest("#sndSheet") || e.target.closest("#sndBtn")) return;
   holdStart = performance.now(); $("#ring").style.opacity = 1;
   const c = $("#ringC");
   const step = () => {
@@ -611,6 +636,10 @@ $("#pVoiceSel").addEventListener("change", async e => {
   catch(err){ msg.textContent = "Couldn’t load that voice. Staying with the current one."; e.target.value = voiceId; }
   btn.disabled = false;
 });
+$("#sndBtn").addEventListener("click", e => { e.stopPropagation();
+  document.querySelectorAll("#sndSheet [data-mirror]").forEach(el => el.value = $("#"+el.dataset.mirror).value);
+  $("#sndSheet").classList.add("on"); });
+$("#sndClose").addEventListener("click", e => { e.stopPropagation(); $("#sndSheet").classList.remove("on"); });
 $("#resumeBtn").addEventListener("click", () => {
   $("#pausedLayer").classList.remove("on");
   state.paused = false; audio.resume(); requestWake();
