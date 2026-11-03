@@ -511,8 +511,9 @@ document.querySelectorAll(".modes a").forEach(a => a.addEventListener("click", e
 </script>
 <!-- ===== Disclaimer gate (shared by KAP and EMDR pages) ===== -->
 <style>
-  #discGate{position:fixed;inset:0;z-index:9999;background:#08070e;display:none;overflow:auto;padding:calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 30px);animation:dgIn 1.2s ease both;font:15.5px/1.55 ui-sans-serif,-apple-system,system-ui,sans-serif;color:#e6e1d8}
+  #discGate{position:absolute;top:0;left:0;right:0;min-height:100%;z-index:9999;background:#08070e;display:none;padding:calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 30px);animation:dgIn 1.2s ease both;font:15.5px/1.55 ui-sans-serif,-apple-system,system-ui,sans-serif;color:#e6e1d8}
   #discGate.on{display:block}
+  body.gated > *:not(#discGate):not(script):not(style){display:none!important}
   @keyframes dgIn{from{opacity:0}to{opacity:1}}
   #discGate .wrap{max-width:540px;margin:0 auto}
   #discGate .tag{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#e39a7f;border:1px solid #e39a7f;border-radius:999px;padding:4px 10px}
@@ -557,11 +558,11 @@ document.querySelectorAll(".modes a").forEach(a => a.addEventListener("click", e
   const KEY = "app_disclaimer_ack_v1", DAYS = 30;
   let ok = false; try{ const t = +localStorage.getItem(KEY); ok = t && (Date.now() - t) < DAYS*864e5; }catch(e){}
   const g = document.getElementById("discGate");
-  if(!ok){ g.classList.add("on"); document.documentElement.style.overflow = "hidden"; }
+  if(!ok){ g.classList.add("on"); document.body.classList.add("gated"); window.scrollTo(0,0); }
   const boxes = [...g.querySelectorAll(".dgc")], go = document.getElementById("dgGo");
   boxes.forEach(b => b.onchange = () => go.disabled = !boxes.every(x => x.checked));
   go.onclick = () => { try{ localStorage.setItem(KEY, Date.now()); }catch(e){} g.style.transition = "opacity 1s ease"; g.style.opacity = 0;
-    setTimeout(() => { g.classList.remove("on"); g.style.opacity = ""; document.documentElement.style.overflow = ""; }, 1000); };
+    setTimeout(() => { g.classList.remove("on"); g.style.opacity = ""; document.body.classList.remove("gated"); window.scrollTo(0,0); }, 1000); };
 })();
 </script>
 
