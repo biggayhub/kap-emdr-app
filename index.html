@@ -169,11 +169,11 @@
   <details style="margin-top:22px" open>
     <summary class="muted sans" style="cursor:pointer">Sound</summary>
     <div class="snd" data-prefix="">
-      <label>Voice volume</label><input type="range" id="voiceVol" min="0" max="100" value="80">
+      <label>Voice volume</label><input type="range" id="voiceVol" min="0" max="100" value="72">
       <label>Music volume</label><input type="range" id="musicVol" min="0" max="100" value="55">
       <label>Voice tone <span>warmer ↔ clearer</span></label><input type="range" id="voiceTone" min="-100" max="100" value="0">
       <label>Music tone <span>softer ↔ airier</span></label><input type="range" id="musicTone" min="0" max="100" value="50">
-      <label>Music dip while the voice speaks <span>none ↔ strong</span></label><input type="range" id="duckAmt" min="0" max="100" value="60">
+      <label>Music dip while the voice speaks <span>none ↔ strong</span></label><input type="range" id="duckAmt" min="0" max="100" value="30">
     </div>
     <button class="btn ghost" id="testBtn" style="margin-top:16px">Test voice and music</button>
   </details>
@@ -263,6 +263,7 @@ $("#intention").value = store.get("kap_intention") || "";
 $("#intention").addEventListener("input", e => store.set("kap_intention", e.target.value));
 $("#journal").value = store.get("kap_journal") || "";
 $("#journal").addEventListener("input", e => store.set("kap_journal", e.target.value));
+if(store.get("kap_sound_v2") !== "1"){ ["musicVol","voiceVol","duckAmt","musicTone"].forEach(id => { try{ localStorage.removeItem("kap_"+id); }catch(e){} }); store.set("kap_sound_v2","1"); }
 ["musicVol","voiceVol","voiceTone","musicTone","duckAmt"].forEach(id => {
   const v = store.get("kap_"+id); if(v) $("#"+id).value = v;
   $("#"+id).addEventListener("input", e => store.set("kap_"+id, e.target.value));
@@ -330,7 +331,7 @@ const audio = (() => {
   // slider 0..100 -> loudness in decibels, so every part of the slider is audible (0 = silent)
   function dbGain(v, unity){ return v <= 0 ? 0 : Math.pow(10, ((v - unity) * 0.42) / 20); }
   function dipLevel(){ return 1 - 0.85 * (+$("#duckAmt").value/100); }
-  function musicTarget(){ return dbGain(+$("#musicVol").value, 75) * 0.8; }
+  function musicTarget(){ return dbGain(+$("#musicVol").value, 55) * 0.45; }   // 55 (default) = the music bed sits ~8-10 dB under the voice
   const raw = {};
   async function fetchSet(paths, onProgress){
     let n = 0;
@@ -364,20 +365,27 @@ const audio = (() => {
     setVolume(){ if(!ctx) return; applyVol(); if(speaking) duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 0.3); if(loopSrc) music.gain.setTargetAtTime(musicTarget(), ctx.currentTime, 0.4); },
     fadeMusic(sec){ if(!ctx) return; const t = ctx.currentTime; music.gain.cancelScheduledValues(t); music.gain.setValueAtTime(music.gain.value, t); music.gain.linearRampToValueAtTime(0, t + sec); },
     stopMusic(){ if(loopSrc){ try{ loopSrc.stop(ctx.currentTime + 0.5); }catch(e){} music.gain.setTargetAtTime(0, ctx.currentTime, 0.1); loopSrc = null; } },
-    bell(level=1){ const b = buf["audio/bell2.mp3"]; if(!b) return; const s = ctx.createBufferSource(); s.buffer = b; const g = ctx.createGain(); g.gain.value = level; s.connect(g); g.connect(voice); s.start(); },
+    bell(level=1){ const b = buf["audio/bell2.mp3"]; if(!b) return; const s = ctx.createBufferSource(); s.buffer = b; const g = ctx.createGain();
+      const t = ctx.currentTime + 0.05, L = level * 0.5; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(L, t + 1.2);   // swells in like a bowed bowl
+      const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 2500;
+      s.connect(lp); lp.connect(g); g.connect(voice); s.start(t); },
     playAt(name, when){
       const b = buf[`audio/${voiceId}/${name}.mp3?s4`]; if(!b) return;
-      const s = ctx.createBufferSource(); s.buffer = b; s.connect(voice); s.start(when); scheduled.push(s);
+      const s = ctx.createBufferSource(); s.buffer = b; const fg = ctx.createGain();
+      fg.gain.setValueAtTime(0, when); fg.gain.linearRampToValueAtTime(1, when + 0.25);
+      s.connect(fg); fg.connect(voice); s.start(when); scheduled.push(s);
       s.onended = () => { const i = scheduled.indexOf(s); if(i >= 0) scheduled.splice(i, 1); };
     },
     stopScheduled(){ scheduled.splice(0).forEach(s => { try{ s.stop(); }catch(e){} }); },
     play(name){
       return new Promise(res => {
         const b = buf[`audio/${voiceId}/${name}.mp3?s4`]; if(!b){ res(); return; }
-        const s = ctx.createBufferSource(); s.buffer = b; s.connect(voice);
-        speaking++; duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 0.8);
-        s.onended = () => { speaking = Math.max(0, speaking-1); if(!speaking) duck.gain.setTargetAtTime(1, ctx.currentTime, 2.5); res(); };
-        s.start(ctx.currentTime + 0.05);
+        const s = ctx.createBufferSource(); s.buffer = b; const fg = ctx.createGain(); const t0 = ctx.currentTime + 0.05;
+        fg.gain.setValueAtTime(0, t0); fg.gain.linearRampToValueAtTime(1, t0 + 0.5);      // half-second fade-in
+        s.connect(fg); fg.connect(voice);
+        speaking++; duck.gain.setTargetAtTime(dipLevel(), ctx.currentTime, 1.5);
+        s.onended = () => { speaking = Math.max(0, speaking-1); if(!speaking) duck.gain.setTargetAtTime(1, ctx.currentTime, 3.5); res(); };
+        s.start(t0);
       });
     },
     level(){ if(!analyser || ctx.state !== "running") return 0; analyser.getFloatTimeDomainData(lvBuf); let s = 0; for(let i=0;i<lvBuf.length;i++) s += lvBuf[i]*lvBuf[i]; return Math.min(1, Math.sqrt(s/lvBuf.length) * 5); },
@@ -449,7 +457,7 @@ $("#startBtn").addEventListener("click", async () => {
 
 async function runPrep(run, from=0){
   state.phase = "prep"; setPhaseLabel("Settling");
-  audio.startMusic(8);
+  audio.startMusic(15);
   if(from === 0){ await wait(3); audio.bell(); await wait(6); } else { await wait(4); }
   const intent = $("#intention").value.trim();
   const steps = ["prep1","prep2","prep3","prep4","prep5","prep6"];
