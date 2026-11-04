@@ -87,6 +87,7 @@
   .snd .hint{font-size:13px;color:var(--dim)}
   .toggle{display:flex;gap:8px;margin-top:8px}
   .toggle button{flex:1;padding:11px 8px;border-radius:14px;border:1px solid var(--faint);background:none;font-size:14px;transition:all .6s}
+  .toggle.two{flex-wrap:wrap} .toggle.two button{flex:1 1 40%}
   .toggle button.sel{border-color:var(--accent);background:var(--accentSoft);color:var(--accent)}
 
   /* full-screen session layers */
@@ -342,7 +343,7 @@ const audio = (() => {
   let ctx, master, voiceBus, vSoft, vAir, bedBus, duck, analyser, bedSrc = null, bedName = null, lv;
   const raw = {}, buf = {}, active = new Set(), scheduled = [];
   let speaking = 0, paused = false;
-  const BEDS = { tones:"audio/bed_tones.mp3", waves:"audio/bed_waves.mp3" };
+  const BEDS = { tones:"audio/bed_tones.mp3", waves:"audio/bed_waves.mp3", binaural:"audio/bed_binaural.mp3" };
   function ensure(){
     if(ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -423,13 +424,15 @@ function panelHTML(){ return `
   <div class="row"><div class="name">Soften sharp sounds</div><div class="hint">Takes the edge off hissy “s” and “t” sounds</div>
     <div class="toggle" data-k="soft"><button data-v="off">Natural</button><button data-v="on">Softer</button></div></div>
   <div class="row"><div class="name">Background</div>
-    <div class="toggle" data-k="bed"><button data-v="tones">Warm tones</button><button data-v="waves">Soft waves</button><button data-v="none">Silence</button></div></div>
+    <div class="toggle two" data-k="bed"><button data-v="tones">Warm tones</button><button data-v="waves">Soft waves</button><button data-v="binaural">Binaural</button><button data-v="none">Silence</button></div>
+    <div class="hint binHint" style="margin-top:8px">Binaural: warm tones with a slow, gentle 6 Hz pulse between your ears. Use headphones to feel it.</div></div>
   <div class="row bedVolRow"><div class="name">Background volume</div><input type="range" min="1" max="100" data-k="bedVol" aria-label="Background volume"><div class="ends"><span>Barely there</span><span>Fuller</span></div></div>`; }
 document.querySelectorAll(".snd[data-panel]").forEach(p => p.innerHTML = panelHTML());
 function syncPanels(){
   document.querySelectorAll(".snd input[data-k]").forEach(i => i.value = settings[i.dataset.k]);
   document.querySelectorAll(".snd .toggle").forEach(t => t.querySelectorAll("button").forEach(b => b.classList.toggle("sel", b.dataset.v === settings[t.dataset.k])));
   document.querySelectorAll(".bedVolRow").forEach(r => r.style.opacity = settings.bed === "none" ? .35 : 1);
+  document.querySelectorAll(".binHint").forEach(h => h.style.display = settings.bed === "binaural" ? "block" : "none");
 }
 document.addEventListener("input", e => { const i = e.target.closest(".snd input[data-k]"); if(!i) return; setSetting(i.dataset.k, i.value); syncPanels(); audio.apply(false); });
 document.addEventListener("click", e => {
