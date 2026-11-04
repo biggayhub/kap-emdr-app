@@ -295,8 +295,9 @@ document.addEventListener("click", e => { const g = e.target.closest("[data-go]"
 })();
 
 /* ---------------- settings ---------------- */
-const DEF = { len:"60", breath:"5", cues:"some", end:"return", voiceVol:"70", bed:"tones", bedVol:"45", soft:"off", bin:"off", binVol:"40" };
+const DEF = { len:"60", breath:"5", cues:"some", end:"return", voiceVol:"80", bed:"tones", bedVol:"45", soft:"off", bin:"off", binVol:"40", toneVol:"35" };
 const settings = {};
+if(store.get("g_vmap2") !== "1"){ ["voiceVol","bedVol","binVol"].forEach(k => store.del("g_" + k)); store.set("g_vmap2", "1"); }
 Object.keys(DEF).forEach(k => settings[k] = store.get("g_" + k) || DEF[k]);
 if(settings.bed === "binaural"){ settings.bed = "tones"; settings.bin = "on"; store.set("g_bed", "tones"); store.set("g_bin", "on"); }
 function setSetting(k, v){ settings[k] = String(v); store.set("g_" + k, String(v)); }
@@ -365,9 +366,12 @@ const audio = (() => {
   // sliders 0..100 -> decibels, so every part of the slider does something
   // wide, even steps: below the default each notch is quieter by ~0.5 dB, so "Quieter" really is quieter
   const curve = (v, def, lo, hi) => Math.pow(10, (v < def ? (v - def) * lo : (v - def) * hi) / 20);
-  const voiceGain = () => { const v = +settings.voiceVol; return v <= 0 ? 0 : curve(v, 70, 0.45, 0.25); };
-  const binGain = () => { const v = +settings.binVol; return settings.bin !== "on" || v <= 0 ? 0 : 0.035 * curve(v, 40, 0.5, 0.25); };
-  const bedGain = () => { const v = +settings.bedVol; if(settings.bed === "none" || v <= 0) return 0; return 0.35 * curve(v, 45, 0.5, 0.25); };   // default sits ~12 dB under her voice
+  // Even steps all the way: every notch is 0.3 dB, the top is her natural level (never boosted, so never harsh),
+  // the bottom is about 30 dB quieter. Background and binaural follow the same even scale.
+  const even = (v, top) => v <= 0 ? 0 : top * Math.pow(10, (v - 100) * 0.3 / 20);
+  const voiceGain = () => even(+settings.voiceVol, 1);
+  const binGain = () => settings.bin !== "on" ? 0 : even(+settings.binVol, 0.139);
+  const bedGain = () => { const v = +settings.bedVol; if(settings.bed === "none" || v <= 0) return 0; return even(v, 1.17); };   // default sits ~12 dB under her voice
   function apply(tc){
     if(!ctx) return; const t = ctx.currentTime, s = settings.soft === "on";
     const glide = (param, val, k) => { param.cancelScheduledValues(t); param.setValueAtTime(param.value, t); param.setTargetAtTime(val, t, k); };
@@ -433,9 +437,13 @@ const audio = (() => {
     resume(){ if(!ctx) return; paused = false; ctx.resume().then(() => { const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(1, t, 0.35); }); },
     level(){ if(!analyser) return 0; analyser.getFloatTimeDomainData(lv); let s = 0; for(let i = 0; i < lv.length; i++) s += lv[i] * lv[i]; return Math.sqrt(s / lv.length); },
     // EMDR: a very soft tone on one side
-    tone(side){ ensure(); const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(), p = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-      o.type = "sine"; o.frequency.value = 392; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.06 * voiceGain(), t + 0.08); g.gain.setTargetAtTime(0, t + 0.2, 0.12);
-      o.connect(g); if(p){ p.pan.value = side; g.connect(p); p.connect(master); } else g.connect(master); o.start(t); o.stop(t + 1.2); },
+    // EMDR: a very soft tone on one side. Its own volume, independent of the guide's voice.
+    tone(side){ ensure(); const v = +settings.toneVol; if(v <= 0) return;
+      const lvl = 0.03 * curve(v, 35, 0.45, 0.17);              // default is soft; the top end stays comfortable
+      const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(), p = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+      o.type = "sine"; o.frequency.value = 330;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(lvl, t + 0.12); g.gain.setTargetAtTime(0, t + 0.25, 0.15);
+      o.connect(g); if(p){ p.pan.value = side; g.connect(p); p.connect(master); } else g.connect(master); o.start(t); o.stop(t + 1.5); },
   };
 })();
 
@@ -744,9 +752,10 @@ const STEPS = {
     <p class="dim">Like watching scenery from a train window: it passes by. You're safe here, right now.</p>
     <div id="after"></div>
     <button class="btn" id="setGo">Start the light</button>
-    <details style="margin-top:14px"><summary>Light and tone settings</summary>
+    <details style="margin-top:14px" open><summary>Light and tone settings</summary>
       <p class="dim small" style="margin:6px 0">Speed</p><div class="toggle" id="spd"><button data-v="gentle">Gentle</button><button data-v="steady">Steady</button></div>
-      <p class="dim small" style="margin:14px 0 6px">Soft side-to-side tones</p><div class="toggle" id="tns"><button data-v="on">On</button><button data-v="off">Off</button></div></details>`,
+      <p class="dim small" style="margin:14px 0 6px">Soft side-to-side tones</p><div class="toggle" id="tns"><button data-v="on">On</button><button data-v="off">Off</button></div>
+      <div id="tVolRow"><p class="dim small" style="margin:14px 0 0">Tone volume <span class="small">(you'll hear a sample as you slide)</span></p><input type="range" min="1" max="100" id="tVol"><div class="ends"><span>Barely there</span><span>Clear</span></div></div></details>`,
   install: () => `<h1>Strengthen the kinder belief</h1>
     <p>Does <b>“${esc(E.t.pc)}”</b> still fit? You can change the words.</p><input type="text" id="pcEdit" value="${esc(E.t.pc)}">
     <p style="margin-top:14px">Hold the memory together with these words, and follow the light.</p>
@@ -794,7 +803,11 @@ const HOOKS = {
   process(){
     const tg = (id, key, val) => { const el = $("#" + id); el.querySelectorAll("button").forEach(b => b.classList.toggle("sel", b.dataset.v === val)); el.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; el.querySelectorAll("button").forEach(x => x.classList.toggle("sel", x === b)); key(b.dataset.v); }); };
     tg("spd", v => { E.speed = v; store.set("g_speed", v); }, E.speed);
-    tg("tns", v => { E.tones = v === "on"; store.set("g_tones", v); }, E.tones ? "on" : "off");
+    const vr = () => $("#tVolRow").style.display = E.tones ? "block" : "none";
+    tg("tns", v => { E.tones = v === "on"; store.set("g_tones", v); vr(); if(E.tones) sampleTones(); }, E.tones ? "on" : "off"); vr();
+    const tv = $("#tVol"); tv.value = settings.toneVol; let lastS = 0;
+    tv.addEventListener("input", () => { setSetting("toneVol", tv.value); const n = performance.now(); if(n - lastS > 450){ lastS = n; audio.unlock(); audio.tone(sideFlip = -sideFlip); } });
+    tv.addEventListener("change", () => sampleTones());
     $("#setGo").onclick = () => runSet(24, "", afterProcessSet);
   },
   install(){ $("#setGo").onclick = () => { E.t.pc = $("#pcEdit").value.trim() || E.t.pc; runSet(12, "", () => {
@@ -804,6 +817,8 @@ const HOOKS = {
   body(){ $("#bodySet").onclick = () => { $("#after").innerHTML = `<p class="dim" style="margin-top:12px">Just notice that feeling, and follow the light.</p>`; runSet(24, "", () => { $("#after").innerHTML = `<button class="btn" onclick="to('close')">Continue to closing</button>`; }); }; },
   close(){ $("#breatheGo").onclick = () => guidedBreath(30, () => {}); },
 };
+let sideFlip = 0.8;
+async function sampleTones(){ await audio.unlock(); audio.tone(-0.8); await wait(0.7); audio.tone(0.8); }
 function saveCalm(){ const p = $("#cPlace"), w = $("#cWord"); if(p){ calm.place = p.value.trim(); calm.word = w.value.trim(); store.set("steady-calm", JSON.stringify(calm)); } }
 function afterProcessSet(){
   E.sets++;
