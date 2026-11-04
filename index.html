@@ -295,9 +295,10 @@ document.addEventListener("click", e => { const g = e.target.closest("[data-go]"
 })();
 
 /* ---------------- settings ---------------- */
-const DEF = { len:"60", breath:"5", cues:"some", end:"return", voiceVol:"70", bed:"tones", bedVol:"45", soft:"off" };
+const DEF = { len:"60", breath:"5", cues:"some", end:"return", voiceVol:"70", bed:"tones", bedVol:"45", soft:"off", bin:"off", binVol:"40" };
 const settings = {};
 Object.keys(DEF).forEach(k => settings[k] = store.get("g_" + k) || DEF[k]);
+if(settings.bed === "binaural"){ settings.bed = "tones"; settings.bin = "on"; store.set("g_bed", "tones"); store.set("g_bin", "on"); }
 function setSetting(k, v){ settings[k] = String(v); store.set("g_" + k, String(v)); }
 document.querySelectorAll(".chips[data-set]").forEach(row => {
   const k = row.dataset.set;
@@ -343,7 +344,8 @@ const audio = (() => {
   let ctx, master, voiceBus, vSoft, vAir, bedBus, duck, analyser, bedSrc = null, bedName = null, lv;
   const raw = {}, buf = {}, active = new Set(), scheduled = [];
   let speaking = 0, paused = false;
-  const BEDS = { tones:"audio/bed_tones.mp3", waves:"audio/bed_waves.mp3", binaural:"audio/bed_binaural.mp3" };
+  const BEDS = { tones:"audio/bed_tones.mp3", waves:"audio/bed_waves.mp3" };
+  let bin = null, bgActive = false;
   function ensure(){
     if(ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -361,13 +363,18 @@ const audio = (() => {
     apply(0.05);
   }
   // sliders 0..100 -> decibels, so every part of the slider does something
-  const voiceGain = () => { const v = +settings.voiceVol; return v <= 0 ? 0 : Math.pow(10, (v - 70) * 0.2 / 20); };
-  const bedGain = () => { const v = +settings.bedVol; if(settings.bed === "none" || v <= 0) return 0; return 0.35 * Math.pow(10, (v - 45) * 0.2 / 20); };   // default sits ~12 dB under her voice
+  // wide, even steps: below the default each notch is quieter by ~0.5 dB, so "Quieter" really is quieter
+  const curve = (v, def, lo, hi) => Math.pow(10, (v < def ? (v - def) * lo : (v - def) * hi) / 20);
+  const voiceGain = () => { const v = +settings.voiceVol; return v <= 0 ? 0 : curve(v, 70, 0.45, 0.25); };
+  const binGain = () => { const v = +settings.binVol; return settings.bin !== "on" || v <= 0 ? 0 : 0.035 * curve(v, 40, 0.5, 0.25); };
+  const bedGain = () => { const v = +settings.bedVol; if(settings.bed === "none" || v <= 0) return 0; return 0.35 * curve(v, 45, 0.5, 0.25); };   // default sits ~12 dB under her voice
   function apply(tc){
     if(!ctx) return; const t = ctx.currentTime, s = settings.soft === "on";
-    voiceBus.gain.setTargetAtTime(voiceGain(), t, tc);
+    const glide = (param, val, k) => { param.cancelScheduledValues(t); param.setValueAtTime(param.value, t); param.setTargetAtTime(val, t, k); };
+    glide(voiceBus.gain, voiceGain(), tc);
     vSoft.gain.setTargetAtTime(s ? -6 : 0, t, tc); vAir.gain.setTargetAtTime(s ? -6 : 0, t, tc);
-    if(bedSrc) bedBus.gain.setTargetAtTime(bedGain(), t, Math.max(tc, 0.6));
+    if(bedSrc) glide(bedBus.gain, bedGain(), Math.max(tc, 0.3));
+    if(bin) glide(bin.g.gain, binGain(), Math.max(tc, 0.3));
   }
   async function fetchArr(p){ if(!raw[p]){ const r = await fetch(p); if(!r.ok) throw new Error(p); raw[p] = await r.arrayBuffer(); } return raw[p]; }
   function decode(ab){ return new Promise((res, rej) => { const p = ctx.decodeAudioData(ab.slice(0), res, rej); if(p && p.then) p.then(res, rej); }); }
@@ -408,6 +415,20 @@ const audio = (() => {
     },
     stopBed(fadeSec = 4){ if(!bedSrc) return; const s = bedSrc, t = ctx.currentTime; s._g.gain.cancelScheduledValues(t); s._g.gain.setValueAtTime(s._g.gain.value, t); s._g.gain.linearRampToValueAtTime(0, t + fadeSec); try{ s.stop(t + fadeSec + 0.2); }catch(e){} bedSrc = null; bedName = null; },
     get bedOn(){ return !!bedSrc; },
+    get bgActive(){ return bgActive; },
+    get debug(){ return ctx ? { voice:+voiceBus.gain.value.toFixed(3), bed:+bedBus.gain.value.toFixed(3), bin: bin ? +bin.g.gain.value.toFixed(4) : null, bedOn:!!bedSrc } : null; },
+    // Binaural pulse: a pure tone in each ear, 6 Hz apart, made live (so it's perfectly smooth). Can play alone or over a background.
+    syncBin(fadeSec = 8){
+      ensure(); const t = ctx.currentTime;
+      if(settings.bin !== "on"){ this.stopBin(3); return; }
+      if(bin){ bin.g.gain.cancelScheduledValues(t); bin.g.gain.setValueAtTime(bin.g.gain.value, t); bin.g.gain.linearRampToValueAtTime(binGain(), t + fadeSec); return; }
+      const m = ctx.createChannelMerger(2), g = ctx.createGain(); g.gain.value = 0; m.connect(g); g.connect(duck);
+      const oscs = [[196, 0, 1], [294, 0, .35], [202, 1, 1], [300, 1, .35]].map(([f, ch, a]) => { const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.value = f; og.gain.value = a; o.connect(og); og.connect(m, 0, ch); o.start(t); return o; });
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(binGain(), t + fadeSec); bin = { g, oscs };
+    },
+    stopBin(fadeSec = 4){ if(!bin) return; const b = bin, t = ctx.currentTime; b.g.gain.cancelScheduledValues(t); b.g.gain.setValueAtTime(b.g.gain.value, t); b.g.gain.linearRampToValueAtTime(0, t + fadeSec); b.oscs.forEach(o => { try{ o.stop(t + fadeSec + 0.3); }catch(e){} }); bin = null; },
+    startBg(fadeSec){ bgActive = true; this.startBed(fadeSec); this.syncBin(Math.min(fadeSec, 10)); },
+    stopBg(fadeSec){ bgActive = false; this.stopBed(fadeSec); this.stopBin(fadeSec); },
     pause(){ if(!ctx || paused) return; paused = true; const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(0, t, 0.15); setTimeout(() => { if(paused) ctx.suspend(); }, 800); },
     resume(){ if(!ctx) return; paused = false; ctx.resume().then(() => { const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(1, t, 0.35); }); },
     level(){ if(!analyser) return 0; analyser.getFloatTimeDomainData(lv); let s = 0; for(let i = 0; i < lv.length; i++) s += lv[i] * lv[i]; return Math.sqrt(s / lv.length); },
@@ -424,21 +445,23 @@ function panelHTML(){ return `
   <div class="row"><div class="name">Soften sharp sounds</div><div class="hint">Takes the edge off hissy “s” and “t” sounds</div>
     <div class="toggle" data-k="soft"><button data-v="off">Natural</button><button data-v="on">Softer</button></div></div>
   <div class="row"><div class="name">Background</div>
-    <div class="toggle two" data-k="bed"><button data-v="tones">Warm tones</button><button data-v="waves">Soft waves</button><button data-v="binaural">Binaural</button><button data-v="none">Silence</button></div>
-    <div class="hint binHint" style="margin-top:8px">Binaural: warm tones with a slow, gentle 6 Hz pulse between your ears. Use headphones to feel it.</div></div>
-  <div class="row bedVolRow"><div class="name">Background volume</div><input type="range" min="1" max="100" data-k="bedVol" aria-label="Background volume"><div class="ends"><span>Barely there</span><span>Fuller</span></div></div>`; }
+    <div class="toggle" data-k="bed"><button data-v="tones">Warm tones</button><button data-v="waves">Soft waves</button><button data-v="none">None</button></div></div>
+  <div class="row bedVolRow"><div class="name">Background volume</div><input type="range" min="1" max="100" data-k="bedVol" aria-label="Background volume"><div class="ends"><span>Barely there</span><span>Fuller</span></div></div>
+  <div class="row"><div class="name">Binaural pulse</div><div class="hint">A slow, gentle 6 Hz pulse between your ears. Needs headphones. Use it alone (set Background to None) or with any background.</div>
+    <div class="toggle" data-k="bin"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
+  <div class="row binVolRow"><div class="name">Binaural volume</div><input type="range" min="1" max="100" data-k="binVol" aria-label="Binaural volume"><div class="ends"><span>Barely there</span><span>Fuller</span></div></div>`; }
 document.querySelectorAll(".snd[data-panel]").forEach(p => p.innerHTML = panelHTML());
 function syncPanels(){
   document.querySelectorAll(".snd input[data-k]").forEach(i => i.value = settings[i.dataset.k]);
   document.querySelectorAll(".snd .toggle").forEach(t => t.querySelectorAll("button").forEach(b => b.classList.toggle("sel", b.dataset.v === settings[t.dataset.k])));
   document.querySelectorAll(".bedVolRow").forEach(r => r.style.opacity = settings.bed === "none" ? .35 : 1);
-  document.querySelectorAll(".binHint").forEach(h => h.style.display = settings.bed === "binaural" ? "block" : "none");
+  document.querySelectorAll(".binVolRow").forEach(r => r.style.display = settings.bin === "on" ? "block" : "none");
 }
 document.addEventListener("input", e => { const i = e.target.closest(".snd input[data-k]"); if(!i) return; setSetting(i.dataset.k, i.value); syncPanels(); audio.apply(false); });
 document.addEventListener("click", e => {
   const b = e.target.closest(".snd .toggle button"); if(!b) return;
   const k = b.closest(".toggle").dataset.k; setSetting(k, b.dataset.v); syncPanels(); audio.apply(true);
-  if(k === "bed" && (audio.bedOn || hearing || kap.phase !== "idle")) audio.startBed(4);
+  if(audio.bgActive){ if(k === "bed") audio.startBed(4); if(k === "bin") audio.syncBin(4); }
 });
 syncPanels();
 function openSound(){ syncPanels(); fillVoiceSel(); $("#soundSheet").classList.add("on"); }
@@ -479,12 +502,12 @@ renderVoices(); prepareVoice();
 let hearing = false;
 $("#hearBtn").addEventListener("click", async () => {
   const b = $("#hearBtn");
-  if(hearing){ hearing = false; b.innerHTML = "▶&nbsp; Hear how it sounds"; audio.stopVoice(); audio.stopBed(2); return; }
+  if(hearing){ hearing = false; b.innerHTML = "▶&nbsp; Hear how it sounds"; audio.stopVoice(); audio.stopBg(2); return; }
   hearing = true; b.innerHTML = "■&nbsp; Stop"; await audio.unlock();
-  audio.startBed(3); await wait(2);
+  audio.startBg(3); await wait(2);
   while(hearing){ await audio.play("test"); if(hearing) await wait(3); }
 });
-function stopHearing(){ if(hearing){ hearing = false; $("#hearBtn").innerHTML = "▶&nbsp; Hear how it sounds"; audio.stopVoice(); audio.stopBed(1.5); } }
+function stopHearing(){ if(hearing){ hearing = false; $("#hearBtn").innerHTML = "▶&nbsp; Hear how it sounds"; audio.stopVoice(); audio.stopBg(1.5); } }
 
 /* ---------------- KAP session ---------------- */
 const kap = { phase:"idle", run:0, events:[], j0:0, timer:null, breath:null, wake:null, prepIndex:0, nudge:null };
@@ -512,7 +535,7 @@ $("#resumeGo").addEventListener("click", async () => {
   $("#resumeGo").textContent = "Getting ready…";
   await audio.unlock(); await audio.prefetchVoice(voiceId); await audio.decodeVoice(voiceId);
   $("#resumeGo").textContent = "Continue where I left off";
-  enterStage(); const run = ++kap.run; audio.startBed(15);
+  enterStage(); const run = ++kap.run; audio.startBg(15);
   if(s.phase === "journey"){ await wait(4); startJourney(s); }
   else if(s.phase === "gate"){ await wait(3); showGate(); }
   else runPrep(run, s.prepIndex || 0);
@@ -531,7 +554,7 @@ $("#kapStage").addEventListener("pointerdown", touchIdle);
 
 async function runPrep(run, from){
   kap.phase = "prep"; setPhase("Settling in");
-  audio.startBed(20);
+  audio.startBg(20);
   await wait(from === 0 ? 6 : 4);
   const intent = $("#intention").value.trim();
   const steps = ["prep1","prep2","prep3","prep4","prep5","prep6"];
@@ -595,14 +618,14 @@ function startJourney(resume){
 async function finish(){
   kap.phase = "closing"; clearInterval(kap.timer); clearProgress();
   await vq; await wait(3);
-  if(settings.end === "rest"){ await audio.play("endRest"); audio.stopBed(120); }
-  else { await audio.play("endReturn"); audio.stopBed(40); caption("Welcome back. Take all the time you need."); }
+  if(settings.end === "rest"){ await audio.play("endRest"); audio.stopBg(120); }
+  else { await audio.play("endReturn"); audio.stopBg(40); caption("Welcome back. Take all the time you need."); }
   kap.phase = "done"; await wait(settings.end === "rest" ? 120 : 40);
   if(settings.end === "return"){ await fadeOut($("#kapStage"), 1600); kap.phase = "idle"; go("home"); }
 }
 function endKap(){
   kap.run++; kap.phase = "idle"; kap.breath = null; clearInterval(kap.timer); clearInterval(kap.nudge);
-  audio.stopScheduled(); audio.stopVoice(); audio.stopBed(3); caption(""); $("#gate").classList.remove("on","show");
+  audio.stopScheduled(); audio.stopVoice(); audio.stopBg(3); caption(""); $("#gate").classList.remove("on","show");
   fadeOut($("#kapStage"), 1600); go("home");
 }
 
